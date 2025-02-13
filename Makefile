@@ -16,6 +16,61 @@ toy:
 			rm -f tmp.csv ; \
 		done
 
+evasion_mimicry:
+	cd ../../data && mkdir -p mimicry_data_parsed
+	cd ../../data/mimicry_data_parsed && mkdir -p base_train && mkdir -p stream_train
+	cd ../../data/mimicry_data_parsed && mkdir -p base_test && mkdir -p stream_test
+	test -f venv/bin/activate || virtualenv -p $(shell which python) venv
+	. venv/bin/activate ; \
+		pip install tqdm pandas ; \
+		number=0 ; 
+			for f in $(shell ls ../../data/mimicry_attack/trainGraphs) ; do \
+			. venv/bin/activate ; \
+			python streamspot/parse_fast.py -a -i ../../data/mimicry_attack/trainGraphs/$$f -b ../../data/mimicry_data_parsed/base_train/mimicry-benign-$$number.txt -S ../../data/mimicry_data_parsed/stream_train/stream-benign-$$number.txt ; \
+			number=`expr $$number + 1` ; \
+			rm -f tmp.csv ; 
+			done ; \
+		number=0 ; 
+			for f in $(shell ls ../../data/mimicry_attack/evasion) ; do \
+			. venv/bin/activate ; \
+			python streamspot/parse_fast.py -a -i ../../data/mimicry_attack/evasion/$$f -b ../../data/mimicry_data_parsed/base_test/mimicry-evasion-$$number.txt -S ../../data/mimicry_data_parsed/stream_test/stream-evasion-$$number.txt ; \
+			number=`expr $$number + 1` ; \
+			rm -f tmp.csv ; \
+			done ; \
+		number=0 ; 
+			for f in $(shell ls ../../data/mimicry_attack/attackGraphs) ; do \
+			. venv/bin/activate ; \
+			python streamspot/parse_fast.py -a -i ../../data/mimicry_attack/attackGraphs/$$f -b ../../data/mimicry_data_parsed/base_test/mimicry-attack-$$number.txt -S ../../data/mimicry_data_parsed/stream_test/stream-attack-$$number.txt ; \
+			number=`expr $$number + 1` ; \
+			rm -f tmp.csv ; \
+			done ; \
+		number=0 ; \
+			for f in $(shell ls ../../data/mimicry_attack/testGraphs) ; do \
+			. venv/bin/activate ; \
+			python streamspot/parse_fast.py -a -i ../../data/mimicry_attack/testGraphs/$$f -b ../../data/mimicry_data_parsed/base_test/mimicry-benign-$$number.txt -S ../../data/mimicry_data_parsed/stream_test/stream-benign-$$number.txt ; \
+			number=`expr $$number + 1` ; \
+			rm -f tmp.csv ; \
+			done ; \
+
+streamspot_test:
+	cd /../data && mkdir -p toy_data
+	cd ../../data/toy_data && mkdir -p base_train && mkdir -p stream_train
+	cd ../../data/toy_data && mkdir -p base_test && mkdir -p stream_test
+	test -f venv/bin/activate || virtualenv -p $(shell which python) venv
+	. venv/bin/activate ; \
+		pip install tqdm pandas ; \
+		number=0 ; while [ $$number -le 99 ] ; do \
+			python streamspot/parse_fast.py -g $$number -a -i ../../data/all.tsv -b ../../data/toy_data/base_train/base-toy-$$number.txt -S ../../data/toy_data/stream_train/stream-toy-$$number.txt ; \
+			number=`expr $$number + 4` ; \
+			rm -f tmp.csv ; \
+		done ; \
+		number=300 ; while [ $$number -le 399 ] ; do \
+			python streamspot/parse_fast.py -g $$number -a -i ../../data/all.tsv -b ../../data/toy_data/base_test/base-attack-$$number.txt -S ../../data/toy_data/stream_test/stream-attack-$$number.txt ; \
+			number=`expr $$number + 16` ; \
+			rm -f tmp.csv ; \
+		done
+
+
 youtube:
 	cd ../../data && mkdir -p youtube_data
 	cd ../../data/youtube_data && mkdir -p base_train && mkdir -p stream_train
