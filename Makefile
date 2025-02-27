@@ -236,39 +236,40 @@ wget_interval_attack:
 	done
 
 cadets_prepare:
-	python cadets/make_gen.py
-	cd cadets && make benign1 && make benign2 && make benign3 && make pandex
+	cd cadets && python make_gen.py && make benign1 && make benign2 && make benign3 && make pandex
+	#cd cadets && make benign1 && make benign2 && make benign3 && make pandex
+
 
 cadets_train:
 	cd ../../data/benign && mkdir -p base && mkdir -p stream
 	number=0 ; while [ $$number -le 49 ] ; do \
-		python cadets/prepare.py ../../data/benign/benign1_$$number benign1-$$number.txt ; \
-		python camflow/parse.py benign1-$$number.txt ../../data/benign/base/base-benign1-$$number.txt ../../data/benign/stream/stream-benign1-$$number.txt ; \
-		rm -rf ../../data/benign/benign1_$$number ; \
+		python cadets/prepare.py ../../data/cadets-e3/benign/benign1_$$number benign1-$$number.txt ; \
+		python camflow/parse.py benign1-$$number.txt ../../data/cadets-e3/benign/base/base-benign1-$$number.txt ../../data/cadets-e3/benign/stream/stream-benign1-$$number.txt ; \
+		rm -rf ../../data/cadets-e3/benign/benign1_$$number ; \
 		rm benign1-$$number.txt ; \
 		number=`expr $$number + 1` ; \
 	done
 	number=0 ; while [ $$number -le 9 ] ; do \
-		python cadets/prepare.py ../../data/benign/benign2_$$number benign2-$$number.txt ; \
-		python camflow/parse.py benign2-$$number.txt ../../data/benign/base/base-benign2-$$number.txt ../../data/benign/stream/stream-benign2-$$number.txt ; \
-		rm -rf ../../data/benign/benign2_$$number ; \
+		python cadets/prepare.py ../../data/cadets-e3/benign/benign2_$$number benign2-$$number.txt ; \
+		python camflow/parse.py benign2-$$number.txt ../../data/cadets-e3/benign/base/base-benign2-$$number.txt ../../data/cadets-e3/benign/stream/stream-benign2-$$number.txt ; \
+		rm -rf ../../data/cadets-e3/benign/benign2_$$number ; \
 		rm benign2-$$number.txt ; \
 		number=`expr $$number + 1` ; \
 	done
 	number=0 ; while [ $$number -le 49 ] ; do \
-		python cadets/prepare.py ../../data/benign/benign3_$$number benign3-$$number.txt ; \
-		python camflow/parse.py benign3-$$number.txt ../../data/benign/base/base-benign3-$$number.txt ../../data/benign/stream/stream-benign3-$$number.txt ; \
-		rm -rf ../../data/benign/benign3_$$number ; \
+		python cadets/prepare.py ../../data/cadets-e3/benign/benign3_$$number benign3-$$number.txt ; \
+		python camflow/parse.py benign3-$$number.txt ../../data/cadets-e3/benign/base/base-benign3-$$number.txt ../../data/cadets-e3/benign/stream/stream-benign3-$$number.txt ; \
+		rm -rf ../../data/cadets-e3/benign/benign3_$$number ; \
 		rm benign3-$$number.txt ; \
 		number=`expr $$number + 1` ; \
 	done
 
 cadets_attack:
-	cd ../../data/attack && mkdir -p base && mkdir -p stream
+	cd ../../data/cadets-e3/attack && mkdir -p base && mkdir -p stream
 	number=0 ; while [ $$number -le 2 ] ; do \
-		python cadets/prepare.py ../../data/attack/pandex_$$number attack-$$number.txt ; \
-		python camflow/parse.py attack-$$number.txt ../../data/attack/base/base-attack-$$number.txt ../../data/attack/stream/stream-attack-$$number.txt ; \
-		rm -rf ../../data/attack/pandex_$$number ; \
+		python cadets/prepare.py ../../data/cadets-e3/attack/pandex_$$number attack-$$number.txt ; \
+		python camflow/parse.py attack-$$number.txt ../../data/cadets-e3/attack/base/base-attack-$$number.txt ../../data/cadets-e3/attack/stream/stream-attack-$$number.txt ; \
+		rm -rf ../../data/cadets-e3/attack/pandex_$$number ; \
 		rm attack-$$number.txt ; \
 		number=`expr $$number + 1` ; \
 	done
