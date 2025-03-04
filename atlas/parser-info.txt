@@ -1,6 +1,6 @@
 Guid seem to be file specific not system specifc, they do not reoccur over multiple fileless_scriptload
 
-How do we handle parent ids? Parse so each parent has an edge to its child in the base file?
+WE MUST INCLUDE PARENTS SOMEHOW, eg firefox used cmd to do stuff. This is exploited in S1. How do we model this
 Should we make it directly to unicorn format or go via streamspot format?
 Should we use PIDs to differentiate differnet processes of the same type  from eachother?
 
@@ -133,7 +133,7 @@ regmod {
 moduleload {
      src: process_path
     src_type: 'a'
-    dst: filemod_name
+    dst: modload_name
     dst_type: 'c'
     edge_type: Modload action (can create multiple edges depending on action, see File Actions list)
     graph_id: schema
