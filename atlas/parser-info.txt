@@ -1,9 +1,12 @@
 Guid seem to be file specific not system specifc, they do not reoccur over multiple fileless_scriptload
 
-How do we handle parent ids? Parse so each parent has an edge to its child in the base file
-(or in the beggining if we want it to match streamspot data to process via streamspot parser)?
+How do we handle parent ids? Parse so each parent has an edge to its child in the base file?
+Should we make it directly to unicorn format or go via streamspot format?
+Should we use PIDs to differentiate differnet processes of the same type  from eachother?
 
-NOTE: NodeIds must start from 0, and cant skip ids!!
+NOTES: 
+NodeIds must start from 0, and cant skip ids!!
+Filepaths are not sensitive to filepaths in Windows which it was recorded from
 
 Streamspot types:
 
@@ -41,6 +44,8 @@ map = {'process': 'a',
        'waitpid': 'F',
        'write': 'G',
        'writev': 'H',
+       'exit' : 'I'
+       'ptrace' : 'J'
       }
 
 File Actions: {
@@ -66,11 +71,36 @@ Netconn Actions: {
     ACTION_CONNECTION_LISTEN: 's'
 }
 
+REGMOD ACTIONS {
+    ACTION_CREATE_KEY: 'u'
+    ACTION_OPEN_KEY_WRITE: 'G'
+}
+
+MODLOAD ACTIONS {
+    ACTION_LOAD_MODULE: 't'
+}
+
+PROCSTART ACTIONS {
+    ACTION_CREATE_PROCESS: 'p'
+}
+
+PROCEND ACTIONS {
+    ACTION_PROCESS_TERMINATE: 'I'
+}
+
+CROSSPROC ACTIONS {
+    ACTION_OPEN_PROCESS_HANDLE: 'J'
+}
+
+SCRIPTLOAD ACTIONS {
+    ACTION_LOAD_SCRIPT: 'p'
+}
+
 
 
 Event Types:
 
-filemod:
+filemod{
     src: process_path
     src_type: 'a'
     dst: filemod_name
@@ -78,6 +108,7 @@ filemod:
     edge_type: File action (can create multiple edges depending on action, see File Actions list)
     graph_id: schema
     time: device_timestamp
+}
 
 netconn{
     src: process_path
@@ -90,14 +121,60 @@ netconn{
 }
 
 regmod {
-    
-}
+    src: process_path
+    src_type: 'a'
+    dst: regmod_name
+    dst_type: 'c'
+    edge_type: Regmod action  (can create multiple edges depending on action, see REGMOD Actions list)
+    graph_id: schema
+    time: device_timestamp
+    }
 
-moduleload:
-procend:
-procstart:
-crossproc:
-scriptload:
+moduleload {
+     src: process_path
+    src_type: 'a'
+    dst: filemod_name
+    dst_type: 'c'
+    edge_type: Modload action (can create multiple edges depending on action, see File Actions list)
+    graph_id: schema
+    time: device_timestamp
+}
+procend {
+    src: process_path
+    src_type: 'a'
+    dst: childproc_name
+    dst_type: 'a'
+    edge_type: Procstart action (can create multiple edges depending on action, see procend Actions list)
+    graph_id: schema
+    time: device_timestamp
+}
+procstart {
+    src: process_path
+    src_type: 'a'
+    dst: childproc_name
+    dst_type: 'a'
+    edge_type: Procstart action (can create multiple edges depending on action, see procstart Actions list)
+    graph_id: schema
+    time: device_timestamp
+}
+crossproc {
+    src: process_path
+    src_type: 'a'
+    dst: crossproc_name
+    dst_type: 'a'
+    edge_type: Crossproc action (can create multiple edges depending on action, see crossproc Actions list)
+    graph_id: schema
+    time: device_timestamp
+}
+scriptload {
+    src: parent_path
+    src_type: 'a'
+    dst: process_path
+    dst_type: 'a'
+    edge_type: Crossproc action (can create multiple edges depending on action, see crossproc Actions list)
+    graph_id: schema
+    time: device_timestamp
+}
 
 
 fileless_scriptload: None found in dataset
