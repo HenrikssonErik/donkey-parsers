@@ -1,0 +1,104 @@
+Guid seem to be file specific not system specifc, they do not reoccur over multiple fileless_scriptload
+
+How do we handle parent ids? Parse so each parent has an edge to its child in the base file
+(or in the beggining if we want it to match streamspot data to process via streamspot parser)?
+
+NOTE: NodeIds must start from 0, and cant skip ids!!
+
+Streamspot types:
+
+map = {'process': 'a',
+       'thread': 'b',
+       'file': 'c',
+       'MAP_ANONYMOUS': 'd',
+       'NA': 'e',
+       'stdin': 'f',
+       'stdout': 'g',
+       'stderr': 'h',
+       'accept': 'i',
+       'access': 'j',
+       'bind': 'k',
+       'chmod': 'l',
+       'clone': 'm',
+       'close': 'n',
+       'connect': 'o',
+       'execve': 'p',
+       'fstat': 'q',
+       'ftruncate': 'r',
+       'listen': 's',
+       'mmap2': 't',
+       'open': 'u',
+       'read': 'v',
+       'recv': 'w',
+       'recvfrom': 'x',
+       'recvmsg': 'y',
+       'send': 'z',
+       'sendmsg': 'A',
+       'sendto': 'B',
+       'stat': 'C',
+       'truncate': 'D',
+       'unlink': 'E',
+       'waitpid': 'F',
+       'write': 'G',
+       'writev': 'H',
+      }
+
+File Actions: {
+ACTION_FILE_CREATE: 'u'
+ACTION_FILE_MOD_OPEN: 'u'
+ACTION_FILE_OPEN_SET_ATTRIBUTES: 'c'
+ACTION_FILE_WRITE: 'G'
+ACTION_FILE_LAST_WRITE: 'G'
+ACTION_FILE_RENAME: '-'
+ACTION_FILE_READ: 'v'
+ACTION_FILE_DELETE: 'E'
+ACTION_FILE_OPEN_READ: 'v'
+ACTION_FILE_OPEN_WRITE: 'G'
+ACTION_FILE_OPEN_DELETE: 'E'
+ACTION_FILE_OPEN_EXECUTE: 'p'
+}
+
+Netconn Actions: {
+    ACTION_CONNECTION_CREATE: 'o'
+    ACTION_CONNECTION_CLOSE: -
+    ACTION_CONNECTION_ESTABLISHED: 'i'
+    ACTION_CONNECTION_CREATE_FAILED: -
+    ACTION_CONNECTION_LISTEN: 's'
+}
+
+
+
+Event Types:
+
+filemod:
+    src: process_path
+    src_type: 'a'
+    dst: filemod_name
+    dst_type: 'c'
+    edge_type: File action (can create multiple edges depending on action, see File Actions list)
+    graph_id: schema
+    time: device_timestamp
+
+netconn{
+    src: process_path
+    src_type: 'a'
+    dst: remote_ip
+    dst_type: 'e'
+    edge_type: Netconn action (can create multiple edges depending on action, see Netconn Actions list)
+    graph_id: schema
+    time: device_timestamp
+}
+
+regmod {
+    
+}
+
+moduleload:
+procend:
+procstart:
+crossproc:
+scriptload:
+
+
+fileless_scriptload: None found in dataset
+scrptload: none found in dataset
