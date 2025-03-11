@@ -51,7 +51,7 @@ def parse_single_file(csvfile):
 			etype = row[":TYPE"]
 			generating_call = row["generating_call"]
 			if edge_id in edge_map:
-				print "EdgeError: Repeated db_id: " + edge_id
+				print("EdgeError: Repeated db_id: " + edge_id)
 			edge_map[edge_id] = Edge(from_id, to_id, etype, generating_call)
 	else: # reading a node csv file
 		for row in reader:
@@ -63,7 +63,7 @@ def parse_single_file(csvfile):
 			if "ty" in reader.fieldnames:
 				ty = row["ty"]
 			if node_id in node_map:
-				print "NodeError: Repeated db_id: " + node_id
+				print("NodeError: Repeated db_id: " + node_id)
 			node_map[node_id] = Node(label, ty)
 
 def write_edgelist_file(file_path):
@@ -87,14 +87,12 @@ if __name__ == "__main__":
 		"""
 		)
 		sys.exit(1)
-
-	files_to_parse = os.listdir(sys.argv[1] + '/db')
+	files_to_parse = os.listdir(sys.argv[1])
 	for input_file in files_to_parse:
 		if input_file == "dbinfo.csv" or input_file == "hydrate.sh" or input_file == "types.csv":
 			pass
 		else:
-			with open(os.path.join(sys.argv[1] + '/db', input_file), 'r') as f:
+			with open(os.path.join(sys.argv[1], input_file), 'r') as f:
 				parse_single_file(f)
 
 	write_edgelist_file(sys.argv[2])
-

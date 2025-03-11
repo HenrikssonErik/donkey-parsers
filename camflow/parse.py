@@ -132,7 +132,8 @@ if __name__ == "__main__":
                 base_file.write("{} {} {}:{}:{}:{}:{}\n".format(edge[0], edge[1], edge[2], edge[3], edge[4], edge[5], edge[6]))
             else:
                 base_file.write("{} {} {}:{}:{}:{}\n".format(edge[0], edge[1], edge[2], edge[3], edge[4], edge[5]))
-	else:
+            
+        else:
             if args.stats:
                 stream_file.write("{} {} {}:{}:{}:{}:{}:{}:{}\n".format(edge[0], edge[1], edge[2], edge[3], edge[4], edge[7], edge[8], edge[5], edge[6]))
             elif args.jiffies:
