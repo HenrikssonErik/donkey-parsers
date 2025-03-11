@@ -151,9 +151,9 @@ theia_e3_benign:
 
 	venv/bin/python ProvParser/provparser/up.py -v -m -S 10000 \
 		-i ../../../data/theia-e3/benign/edgelists_benign/theia-e3-benign.txt.0 \
-		-b ../../../data/theia-e3/benign/base/base-theia-e3-benign.txt.0 \
-		-s ../../../data/theia-e3/benign/stream/stream-theia-e3-benign.txt.0 \
-		
+		-b ../../../data/theia-e3/benign/base/base-theia-e3-benign-0.txt \
+		-s ../../../data/theia-e3/benign/stream/stream-theia-e3-benign-0.txt \
+
 fivedirections_e3:
 	number=0 ; while [ $$number -le 15 ] ; do \
 		cd ../../../data/fivedirections-e3/benign && mkdir fivedirections-e3-benign-$$number && tar zxvf fivedirections-e3-benign-$$number.gz.tar -C fivedirections-e3-benign-$$number && mv fivedirections-e3-benign-$$number/fivedirections-e3-benign.txt.* ../edgelists_benign ; \
