@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 from __future__ import print_function
 import os, sys, argparse
-import tqdm
+import tqdm as tqdm
 
 if __name__ == "__main__":
 	parser = argparse.ArgumentParser(description='Convert edgelist datasets to Unicorn Stream datasets.')

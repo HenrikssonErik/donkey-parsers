@@ -119,6 +119,9 @@ cadets_e3:
 	done
 
 theia_e3:
+	mkdir -p ../../../data/theia-e3/attack/edgelists_attack
+	mkdir -p ../../../data/theia-e3/benign/edgelists_benign
+
 	cd ../../../data/theia-e3/benign && mkdir theia-e3-benign && tar zxvf theia-e3-benign.gz.tar -C theia-e3-benign && mv theia-e3-benign/theia-e3-benign.txt.* ../edgelists_benign
 	cd ../../../data/theia-e3/benign && rm -f theia-e3-benign.gz.tar && rm -rf theia-e3-benign
 	number=0 ; while [ $$number -le 1 ] ; do \
@@ -138,6 +141,19 @@ theia_e3:
 		number=`expr $$number + 1` ; \
 	done
 
+theia_e3_benign:
+	test -f venv/bin/activate || virtualenv -p $(shell which python) venv
+	venv/bin/pip install tqdm pandas
+	
+	mkdir -p ../../../data/theia-e3/benign/edgelists_benign
+	mkdir -p ../../../data/theia-e3/benign/base
+	mkdir -p ../../../data/theia-e3/benign/stream
+
+	venv/bin/python ProvParser/provparser/up.py -v -m -S 10000 \
+		-i ../../../data/theia-e3/benign/edgelists_benign/theia-e3-benign.txt.0 \
+		-b ../../../data/theia-e3/benign/base/base-theia-e3-benign.txt.0 \
+		-s ../../../data/theia-e3/benign/stream/stream-theia-e3-benign.txt.0 \
+		
 fivedirections_e3:
 	number=0 ; while [ $$number -le 15 ] ; do \
 		cd ../../../data/fivedirections-e3/benign && mkdir fivedirections-e3-benign-$$number && tar zxvf fivedirections-e3-benign-$$number.gz.tar -C fivedirections-e3-benign-$$number && mv fivedirections-e3-benign-$$number/fivedirections-e3-benign.txt.* ../edgelists_benign ; \

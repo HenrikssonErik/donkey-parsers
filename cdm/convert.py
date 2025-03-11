@@ -4,24 +4,7 @@ import os, sys, argparse, json, hashlib
 import logging
 # from sqlitedict import SqliteDict
 
-#from constants import *
-
-# CDM record type constants
-CDM_TYPE_EVENT = 'com.bbn.tc.schema.avro.cdm18.Event'
-CDM_TYPE_FILE = 'com.bbn.tc.schema.avro.cdm18.FileObject'
-CDM_TYPE_SOCK = 'com.bbn.tc.schema.avro.cdm18.NetFlowObject'
-CDM_TYPE_SUBJECT = 'com.bbn.tc.schema.avro.cdm18.Subject'
-CDM_TYPE_SRCSINK = 'com.bbn.tc.schema.avro.cdm18.SrcSinkObject'
-CDM_TYPE_PIPE = 'com.bbn.tc.schema.avro.cdm18.UnnamedPipeObject'
-CDM_TYPE_PRINCIPAL = 'com.bbn.tc.schema.avro.cdm18.Principal'
-CDM_TYPE_TAG = 'com.bbn.tc.schema.avro.cdm18.ProvenanceTagNode'
-CDM_TYPE_STARTMARKER = 'com.bbn.tc.schema.avro.cdm18.StartMarker'
-CDM_TYPE_TIMEMARKER = 'com.bbn.tc.schema.avro.cdm18.TimeMarker'
-CDM_TYPE_HOST = 'com.bbn.tc.schema.avro.cdm18.Host'
-CDM_TYPE_KEY = 'com.bbn.tc.schema.avro.cdm18.RegistryKeyObject'
-CDM_TYPE_MEMORY = 'com.bbn.tc.schema.avro.cdm18.MemoryObject'
-CDM_TYPE_ENDMARKER = 'com.bbn.tc.schema.avro.cdm18.EndMarker'
-CDM_TYPE_UNITDEPENDENCY = 'com.bbn.tc.schema.avro.cdm18.UnitDependency'
+import constants
 
 parser = argparse.ArgumentParser(description='Convert CDM data to Unicorn')
 parser.add_argument('--source', help='Input data folder', required=True)
@@ -98,7 +81,7 @@ def labelgen(values):
 		raise TypeError('Unknown type of the input.')
 
 def process_cdm_srcsink(record_value, input_format, nid):
-	"""Process CDM record typed CDM_TYPE_SRCSINK.
+	"""Process CDM record typed constants.CDM_TYPE_SRCSINK.
 
 	values = {'nid', 'type'}
 	"""
@@ -106,7 +89,7 @@ def process_cdm_srcsink(record_value, input_format, nid):
 	values['nid'] = nid
 
 	if 'type' not in record_value:
-		raise KeyError('CDM_TYPE_SRCSINK: type is missing.')
+		raise KeyError('constants.CDM_TYPE_SRCSINK: type is missing.')
 	type_value = read_field(record_value['type'], input_format)
 	values['type'] = type_value
 
@@ -154,12 +137,12 @@ def process_cdm_srcsink(record_value, input_format, nid):
 		pass
 	else:
 		pass
-		# raise KeyError('CDM_TYPE_SRCSINK: type is undefined.')
+		# raise KeyError('constants.CDM_TYPE_SRCSINK: type is undefined.')
 
 	return values
 
 def process_cdm_subject(record_value, input_format, nid):
-	"""Process CDM record typed CDM_TYPE_SUBJECT.
+	"""Process CDM record typed constants.CDM_TYPE_SUBJECT.
 
 	values = {'nid', 'type'}
 	"""
@@ -167,7 +150,7 @@ def process_cdm_subject(record_value, input_format, nid):
 	values['nid'] = nid
 
 	if 'type' not in record_value:
-		raise KeyError('CDM_TYPE_SUBJECT: type is missing.')
+		raise KeyError('constants.CDM_TYPE_SUBJECT: type is missing.')
 	type_value = read_field(record_value['type'], input_format)
 	values['type'] = type_value
 
@@ -182,12 +165,12 @@ def process_cdm_subject(record_value, input_format, nid):
 		pass
 	else:
 		pass
-		# raise KeyError('CDM_TYPE_SUBJECT: type is undefined.')
+		# raise KeyError('constants.CDM_TYPE_SUBJECT: type is undefined.')
 
 	return values
 
 def process_cdm_file(record_value, input_format, nid):
-	"""Process CDM record typed CDM_TYPE_FILE.
+	"""Process CDM record typed constants.CDM_TYPE_FILE.
 
 	values = {'nid', 'uuid', type'}
 	"""
@@ -195,7 +178,7 @@ def process_cdm_file(record_value, input_format, nid):
 	values['nid'] = nid
 	values['uuid'] = record_value['uuid'] # we store UUID to detect identical records
 	if 'type' not in record_value:
-		raise KeyError('CDM_TYPE_FILE: type is missing.')
+		raise KeyError('constants.CDM_TYPE_FILE: type is missing.')
 	type_value = read_field(record_value['type'], input_format)
 	values['type'] = type_value
 
@@ -220,37 +203,37 @@ def process_cdm_file(record_value, input_format, nid):
 		pass
 	else:
 		pass
-		# raise KeyError('CDM_TYPE_FILE: type is undefined.')
+		# raise KeyError('constants.CDM_TYPE_FILE: type is undefined.')
 
 	return values
 
 def process_cdm_sock(record_value, input_format, nid):
-	"""Process CDM record typed CDM_TYPE_SOCK.
+	"""Process CDM record typed constants.CDM_TYPE_SOCK.
 
 	values = {'nid', 'type', 'localAddress', 'localPort', 'remoteAddress', 'remotePort'}
 	"""
 	values = dict()
 	values['nid'] = nid
 	# type must be a NET_FLOW_OBJECT
-	values['type'] = 'NET_FLOW_OBJECT'
+	values['type'] = b'NET_FLOW_OBJECT'
 
 	if 'localAddress' not in record_value:
-		logging.debug('CDM_TYPE_SOCK: localAddress is missing.')
+		logging.debug('constants.CDM_TYPE_SOCK: localAddress is missing.')
 	localAddress = read_field(record_value['localAddress'], input_format)
 	values['localAddress'] = localAddress
 
 	if 'localPort' not in record_value:
-		logging.debug('CDM_TYPE_SOCK: localPort is missing.')
+		logging.debug('constants.CDM_TYPE_SOCK: localPort is missing.')
 	localPort = read_field(record_value['localPort'], input_format)
 	values['localPort'] = localPort
 
 	if 'remoteAddress' not in record_value:
-		logging.debug('CDM_TYPE_SOCK: remoteAddress is missing.')
+		logging.debug('constants.CDM_TYPE_SOCK: remoteAddress is missing.')
 	remoteAddress = read_field(record_value['remoteAddress'], input_format)
 	values['remoteAddress'] = remoteAddress
 
 	if 'remotePort' not in record_value:
-		logging.debug('CDM_TYPE_SOCK: remotePort is missing.')
+		logging.debug('constants.CDM_TYPE_SOCK: remotePort is missing.')
 	remotePort = read_field(record_value['remotePort'], input_format)
 	values['remotePort'] = remotePort
 
@@ -259,32 +242,32 @@ def process_cdm_sock(record_value, input_format, nid):
 	return values
 
 def process_cdm_pipe(record_value, input_format, nid):
-	"""Process CDM record type CDM_TYPE_PIPE.
+	"""Process CDM record type constants.CDM_TYPE_PIPE.
 
 	values = {'nid', 'type', 'sourceUUID', 'sinkUUID'}
 	"""
 	values = dict()
 	values['nid'] = nid
 	# type must be a UNNAMED_PIPE_OBJECT
-	values['type'] = 'UNNAMED_PIPE_OBJECT'
+	values['type'] = b'UNNAMED_PIPE_OBJECT'
 
 	if 'sourceUUID' not in record_value:
-		logging.debug('CDM_TYPE_PIPE: sourceUUID is missing.')
+		logging.debug('constants.CDM_TYPE_PIPE: sourceUUID is missing.')
 	sourceUUID = record_value['sourceUUID']
 	if type(sourceUUID).__name__ == 'NoneType':
 		# in trace data, NoneType exists
 		values['sourceUUID'] = 'None'
 	else:
-		UUID = sourceUUID[CDM_UUID]
+		UUID = sourceUUID[constants.CDM_UUID]
 		values['sourceUUID'] = UUID
 
 	if 'sinkUUID' not in record_value:
-		logging.debug('CDM_TYPE_PIPE: sinkUUID is missing.')
+		logging.debug('constants.CDM_TYPE_PIPE: sinkUUID is missing.')
 	sinkUUID = record_value['sinkUUID']
 	if type(sinkUUID).__name__ == 'NoneType':
 		values['sinkUUID'] = 'None'
 	else:
-		UUID = sinkUUID[CDM_UUID]
+		UUID = sinkUUID[constants.CDM_UUID]
 		values['sinkUUID'] = UUID
 
 	# Currently, no other values to be appended as of 01-04-19.
@@ -292,7 +275,7 @@ def process_cdm_pipe(record_value, input_format, nid):
 	return values
 
 def process_cdm_event(record_value, input_format):
-	"""Process CDM record typed CDM_TYPE_EVENT.
+	"""Process CDM record typed constants.CDM_TYPE_EVENT.
 
 	value = {'uuid', type', 'srcUUID', 'dstUUID', 'bidirectional', 'timestamp'}
 
@@ -304,45 +287,44 @@ def process_cdm_event(record_value, input_format):
 	values['uuid'] = record_value['uuid']
 
 	if 'type' not in record_value:
-		logging.debug('CDM_TYPE_EVENT: type is missing. Event UUID: ' + repr(record_value['uuid']))
+		logging.debug('constants.CDM_TYPE_EVENT: type is missing. Event UUID: ' + repr(record_value['uuid']))
 	type_value = read_field(record_value['type'], input_format)
 	values['type'] = type_value
 	values['srcUUID'] = None
 	values['dstUUID'] = None
 
-
 	if 'timestampNanos' not in record_value:
-		logging.debug('CDM_TYPE_EVENT: timestamp is missing. Event UUID: ' + repr(record_value['uuid']))
+		logging.debug('constants.CDM_TYPE_EVENT: timestamp is missing. Event UUID: ' + repr(record_value['uuid']))
 	timestamp = read_field(record_value['timestampNanos'], input_format)
 	values['timestamp'] = timestamp
 
 	# Currently, no other type-specific or type-general values to be appended as of 01-04-19.
-	if type_value == 'EVENT_CLOSE':
+	if type_value == b'EVENT_CLOSE':
 		# Subject -> Object
 		subject = record_value['subject']
 		if type(subject).__name__ == 'NoneType':
 			logging.debug("EVENT_CLOSE: subject does not exist. Event ID: " + repr(record_value['uuid']))
 		else:
-			subjectUUID = subject[CDM_UUID]
+			subjectUUID = subject[constants.CDM_UUID]
 			values['srcUUID'] = subjectUUID
 
 		object1 = record_value['predicateObject']
 		if type(object1).__name__ == 'NoneType':
 			logging.debug("EVENT_CLOSE: object does not exist. Event ID: " + repr(record_value['uuid']))
 		else:
-			object1UUID = object1[CDM_UUID]
+			object1UUID = object1[constants.CDM_UUID]
 			values['dstUUID'] = object1UUID
 
 		values['bidirectional'] = False
 
-	elif type_value == 'EVENT_FCNTL':
+	elif type_value == b'EVENT_FCNTL':
 		# Subject <-> Object
 		subject = record_value['subject']
 		if type(subject).__name__ == 'NoneType':
 			logging.debug("EVENT_FCNTL: subject does not exist. Event ID: " + repr(record_value['uuid']))
 			# raise ValueError("EVENT_FCNTL: subject must exist.")
 		else:
-			subjectUUID = subject[CDM_UUID]
+			subjectUUID = subject[constants.CDM_UUID]
 			values['srcUUID'] = subjectUUID
 
 		object1 = record_value['predicateObject']
@@ -350,73 +332,73 @@ def process_cdm_event(record_value, input_format):
 			logging.debug("EVENT_FCNTL: object does not exist. Event ID: " + repr(record_value['uuid']))
 			# raise ValueError("EVENT_FCNTL: object must exist.")
 		else:
-			object1UUID = object1[CDM_UUID]
+			object1UUID = object1[constants.CDM_UUID]
 			values['dstUUID'] = object1UUID
 
 		values['bidirectional'] = True
 
-	elif type_value == 'EVENT_CREATE_OBJECT':
+	elif type_value == b'EVENT_CREATE_OBJECT':
 		# Subject -> Object
 		subject = record_value['subject']
 		if type(subject).__name__ == 'NoneType':
 			logging.debug("EVENT_CREATE_OBJECT: subject does not exist. Event ID: " + repr(record_value['uuid']))
 		else:
-			subjectUUID = subject[CDM_UUID]
+			subjectUUID = subject[constants.CDM_UUID]
 			values['srcUUID'] = subjectUUID
 
 		object1 = record_value['predicateObject']
 		if type(object1).__name__ == 'NoneType':
 			logging.debug("EVENT_CREATE_OBJECT: object does not exist. Event ID: " + repr(record_value['uuid']))
 		else:
-			object1UUID = object1[CDM_UUID]
+			object1UUID = object1[constants.CDM_UUID]
 			values['dstUUID'] = object1UUID
 
 		values['bidirectional'] = False
 
-	elif type_value == 'EVENT_ACCEPT':
+	elif type_value == b'EVENT_ACCEPT':
 		# Object -> Subject
 		subject = record_value['subject']
 		if type(subject).__name__ == 'NoneType':
 			logging.debug("EVENT_ACCEPT: subject does not exist. Event ID: " + repr(record_value['uuid']))
 		else:
-			subjectUUID = subject[CDM_UUID]
+			subjectUUID = subject[constants.CDM_UUID]
 			values['dstUUID'] = subjectUUID
 
 		object1 = record_value['predicateObject']
 		if type(object1).__name__ == 'NoneType':
 			logging.debug("EVENT_ACCEPT: object does not exist. Event ID: " + repr(record_value['uuid']))
 		else:
-			object1UUID = object1[CDM_UUID]
+			object1UUID = object1[constants.CDM_UUID]
 			values['srcUUID'] = object1UUID
 
 		values['bidirectional'] = False
 
-	elif type_value == 'EVENT_FORK':
+	elif type_value == b'EVENT_FORK':
 		# Subject -> Object
 		subject = record_value['subject']
 		if type(subject).__name__ == 'NoneType':
 			logging.debug("EVENT_FORK: subject does not exist. Event ID: " + repr(record_value['uuid']))
 		else:
-			subjectUUID = subject[CDM_UUID]
+			subjectUUID = subject[constants.CDM_UUID]
 			values['srcUUID'] = subjectUUID
 
 		object1 = record_value['predicateObject']
 		if type(object1).__name__ == 'NoneType':
 			logging.debug("EVENT_FORK: object does not exist. Event ID: " + repr(record_value['uuid']))
 		else:
-			object1UUID = object1[CDM_UUID]
+			object1UUID = object1[constants.CDM_UUID]
 			values['dstUUID'] = object1UUID
 
 		values['bidirectional'] = False
 
-	elif type_value == 'EVENT_OPEN':
+	elif type_value == b'EVENT_OPEN':
 		# Subject -> Object
 		subject = record_value['subject']
 		if type(subject).__name__ == 'NoneType':
 			logging.debug("EVENT_OPEN: subject does not exist. Event ID: " + repr(record_value['uuid']))
 			# raise ValueError("EVENT_OPEN: subject must exist. Event ID: " + repr(record_value['uuid']))
 		else:
-			subjectUUID = subject[CDM_UUID]
+			subjectUUID = subject[constants.CDM_UUID]
 			values['srcUUID'] = subjectUUID
 
 		object1 = record_value['predicateObject']
@@ -424,68 +406,68 @@ def process_cdm_event(record_value, input_format):
 			logging.debug("EVENT_OPEN: object does not exist. Event ID: " + repr(record_value['uuid']))
 			# raise ValueError("EVENT_OPEN: object must exist. Event ID: " + repr(record_value['uuid']))
 		else:
-			object1UUID = object1[CDM_UUID]
+			object1UUID = object1[constants.CDM_UUID]
 			values['dstUUID'] = object1UUID
 
 		values['bidirectional'] = False
 
-	elif type_value == 'EVENT_READ':
+	elif type_value == b'EVENT_READ':
 		# Object -> Subject
 		subject = record_value['subject']
 		if type(subject).__name__ == 'NoneType':
 			logging.debug("EVENT_READ: subject does not exist. Event ID: " + repr(record_value['uuid']))
 		else:
-			subjectUUID = subject[CDM_UUID]
+			subjectUUID = subject[constants.CDM_UUID]
 			values['dstUUID'] = subjectUUID
 
 		object1 = record_value['predicateObject']
 		if type(object1).__name__ == 'NoneType':
 			logging.debug("EVENT_READ: object does not exist. Event ID: " + repr(record_value['uuid']))
 		else:
-			object1UUID = object1[CDM_UUID]
+			object1UUID = object1[constants.CDM_UUID]
 			values['srcUUID'] = object1UUID
 
 		values['bidirectional'] = False
 
-	elif type_value == 'EVENT_LSEEK':
+	elif type_value == b'EVENT_LSEEK':
 		# Subject -> Object
 		subject = record_value['subject']
 		if type(subject).__name__ == 'NoneType':
 			logging.debug("EVENT_LSEEK: subject does not exist. Event ID: " + repr(record_value['uuid']))
 		else:
-			subjectUUID = subject[CDM_UUID]
+			subjectUUID = subject[constants.CDM_UUID]
 			values['srcUUID'] = subjectUUID
 
 		object1 = record_value['predicateObject']
 		if type(object1).__name__ == 'NoneType':
 			logging.debug("EVENT_LSEEK: object does not exist. Event ID: " + repr(record_value['uuid']))
 		else:
-			object1UUID = object1[CDM_UUID]
+			object1UUID = object1[constants.CDM_UUID]
 			values['dstUUID'] = object1UUID
 
 		values['bidirectional'] = False
 
-	elif type_value == 'EVENT_CHANGE_PRINCIPAL':
+	elif type_value == b'EVENT_CHANGE_PRINCIPAL':
 		# TODO: 
-		# Did not see CDM_TYPE_PRINCIPAL
+		# Did not see constants.CDM_TYPE_PRINCIPAL
 		# Subject -> Object
 		subject = record_value['subject']
 		if type(subject).__name__ == 'NoneType':
 			logging.debug("EVENT_CHANGE_PRINCIPAL: subject does not exist. Event ID: " + repr(record_value['uuid']))
 		else:
-			subjectUUID = subject[CDM_UUID]
+			subjectUUID = subject[constants.CDM_UUID]
 			values['srcUUID'] = subjectUUID
 
 		object1 = record_value['predicateObject']
 		if type(object1).__name__ == 'NoneType':
 			logging.debug("EVENT_CHANGE_PRINCIPAL: object does not exist. Event ID: " + repr(record_value['uuid']))
 		else:
-			object1UUID = object1[CDM_UUID]
+			object1UUID = object1[constants.CDM_UUID]
 			values['dstUUID'] = object1UUID
 
 		values['bidirectional'] = False
 
-	elif type_value == 'EVENT_LOGIN':
+	elif type_value == b'EVENT_LOGIN':
 		# Subject -> Object
 		# TODO:
 		# The relation needs confirmation.
@@ -494,7 +476,7 @@ def process_cdm_event(record_value, input_format):
 			logging.debug("EVENT_LOGIN: subject does not exist. Event ID: " + repr(record_value['uuid']))
 			# raise ValueError("EVENT_LOGIN: subject must exist.")
 		else:
-			subjectUUID = subject[CDM_UUID]
+			subjectUUID = subject[constants.CDM_UUID]
 			values['srcUUID'] = subjectUUID
 
 		object1 = record_value['predicateObject']
@@ -502,202 +484,203 @@ def process_cdm_event(record_value, input_format):
 			logging.debug("EVENT_LOGIN: object does not exist. Event ID: " + repr(record_value['uuid']))
 			# raise ValueError("EVENT_LOGIN: object must exist.")
 		else:
-			object1UUID = object1[CDM_UUID]
+			object1UUID = object1[constants.CDM_UUID]
 			values['dstUUID'] = object1UUID
 
 		values['bidirectional'] = False
 
-	elif type_value == 'EVENT_MODIFY_PROCESS':
+	elif type_value == b'EVENT_MODIFY_PROCESS':
 		# Subject -> Object
 		subject = record_value['subject']
 		if type(subject).__name__ == 'NoneType':
 			logging.debug("EVENT_MODIFY_PROCESS: subject does not exist. Event ID: " + repr(record_value['uuid']))
 		else:
-			subjectUUID = subject[CDM_UUID]
+			subjectUUID = subject[constants.CDM_UUID]
 			values['srcUUID'] = subjectUUID
 
 		object1 = record_value['predicateObject']
 		if type(object1).__name__ == 'NoneType':
 			logging.debug("EVENT_MODIFY_PROCESS: object does not exist. Event ID: " + repr(record_value['uuid']))
 		else:
-			object1UUID = object1[CDM_UUID]
+			object1UUID = object1[constants.CDM_UUID]
 			values['dstUUID'] = object1UUID
 
 		values['bidirectional'] = False
 
-	elif type_value == 'EVENT_EXECUTE':
+	elif type_value == b'EVENT_EXECUTE':
 		# Subject -> Object
 		subject = record_value['subject']
 		if type(subject).__name__ == 'NoneType':
 			logging.debug("EVENT_EXECUTE: subject does not exist. Event ID: " + repr(record_value['uuid']))
 		else:	
-			subjectUUID = subject[CDM_UUID]
+			subjectUUID = subject[constants.CDM_UUID]
 			values['srcUUID'] = subjectUUID
 
 		object1 = record_value['predicateObject']
 		if type(object1).__name__ == 'NoneType':
 			logging.debug("EVENT_EXECUTE: object does not exist. Event ID: " + repr(record_value['uuid']))
 		else:
-			object1UUID = object1[CDM_UUID]
+			object1UUID = object1[constants.CDM_UUID]
 			values['dstUUID'] = object1UUID
 
 		values['bidirectional'] = False
 
-	elif type_value == 'EVENT_MMAP':
+	elif type_value == b'EVENT_MMAP':
 		# Subject <-> Object
 		subject = record_value['subject']
 		if type(subject).__name__ == 'NoneType':
 			logging.debug("EVENT_MMAP: subject does not exist. Event ID: " + repr(record_value['uuid']))
 		else:
-			subjectUUID = subject[CDM_UUID]
+			subjectUUID = subject[constants.CDM_UUID]
 			values['srcUUID'] = subjectUUID
+			
 
 		object1 = record_value['predicateObject']
 		if type(object1).__name__ == 'NoneType':
 			logging.debug("EVENT_MMAP: object does not exist. Event ID: " + repr(record_value['uuid']))
 		else:
-			object1UUID = object1[CDM_UUID]
+			object1UUID = object1[constants.CDM_UUID]
 			values['dstUUID'] = object1UUID
 
 		values['bidirectional'] = True
 
-	elif type_value == 'EVENT_CONNECT':
+	elif type_value == b'EVENT_CONNECT':
 		# Subject -> Object
 		subject = record_value['subject']
 		if type(subject).__name__ == 'NoneType':
 			logging.debug("EVENT_CONNECT: subject does not exist. Event ID: " + repr(record_value['uuid']))
 		else:
-			subjectUUID = subject[CDM_UUID]
+			subjectUUID = subject[constants.CDM_UUID]
 			values['srcUUID'] = subjectUUID
 
 		object1 = record_value['predicateObject']
 		if type(object1).__name__ == 'NoneType':
 			logging.debug("EVENT_CONNECT: object does not exist. Event ID: " + repr(record_value['uuid']))
 		else:
-			object1UUID = object1[CDM_UUID]
+			object1UUID = object1[constants.CDM_UUID]
 			values['dstUUID'] = object1UUID
 
 		values['bidirectional'] = False
 
-	elif type_value == 'EVENT_SENDTO':
+	elif type_value == b'EVENT_SENDTO':
 		# Subject -> Object
 		subject = record_value['subject']
 		if type(subject).__name__ == 'NoneType':
 			logging.debug("EVENT_SENDTO: subject does not exist. Event ID: " + repr(record_value['uuid']))
 		else:
-			subjectUUID = subject[CDM_UUID]
+			subjectUUID = subject[constants.CDM_UUID]
 			values['srcUUID'] = subjectUUID
 
 		object1 = record_value['predicateObject']
 		if type(object1).__name__ == 'NoneType':
 			logging.debug("EVENT_SENDTO: object does not exist. Event ID: " + repr(record_value['uuid']))
 		else:
-			object1UUID = object1[CDM_UUID]
+			object1UUID = object1[constants.CDM_UUID]
 			values['dstUUID'] = object1UUID
 
 		values['bidirectional'] = False
 		
-	elif type_value == 'EVENT_RECVFROM':
+	elif type_value == b'EVENT_RECVFROM':
 		# Object -> Subject
 		subject = record_value['subject']
 		if type(subject).__name__ == 'NoneType':
 			logging.debug("EVENT_RECVFROM: subject does not exist. Event ID: " + repr(record_value['uuid']))
 		else:
-			subjectUUID = subject[CDM_UUID]
+			subjectUUID = subject[constants.CDM_UUID]
 			values['dstUUID'] = subjectUUID
 
 		object1 = record_value['predicateObject']
 		if type(object1).__name__ == 'NoneType':
 			logging.debug("EVENT_RECVFROM: object does not exist. Event ID: " + repr(record_value['uuid']))
 		else:
-			object1UUID = object1[CDM_UUID]
+			object1UUID = object1[constants.CDM_UUID]
 			values['srcUUID'] = object1UUID
 
 		values['bidirectional'] = False
 
-	elif type_value == 'EVENT_WRITE':
+	elif type_value == b'EVENT_WRITE':
 		# Subject -> Object
 		subject = record_value['subject']
 		if type(subject).__name__ == 'NoneType':
 			logging.debug("EVENT_WRITE: subject does not exist. Event ID: " + repr(record_value['uuid']))
 		else:
-			subjectUUID = subject[CDM_UUID]
+			subjectUUID = subject[constants.CDM_UUID]
 			values['srcUUID'] = subjectUUID
 
 		object1 = record_value['predicateObject']
 		if type(object1).__name__ == 'NoneType':
 			logging.debug("EVENT_WRITE: object does not exist. Event ID: " + repr(record_value['uuid']))
 		else:
-			object1UUID = object1[CDM_UUID]
+			object1UUID = object1[constants.CDM_UUID]
 			values['dstUUID'] = object1UUID
 
 		values['bidirectional'] = False
 		
-	elif type_value == 'EVENT_ADD_OBJECT_ATTRIBUTE':
+	elif type_value == b'EVENT_ADD_OBJECT_ATTRIBUTE':
 		# Object1 -> Object2
 		object1 = record_value['predicateObject']
 		if type(object1).__name__ == 'NoneType':
 			logging.debug("EVENT_ADD_OBJECT_ATTRIBUTE: object does not exist. Event ID: " + repr(record_value['uuid']))
 		else:
-			object1UUID = object1[CDM_UUID]
+			object1UUID = object1[constants.CDM_UUID]
 			values['srcUUID'] = object1UUID
 
 		object2 = record_value['predicateObject2']
 		if type(object2).__name__ == 'NoneType':
 			logging.debug("EVENT_ADD_OBJECT_ATTRIBUTE: object2 does not exist. Event ID: " + repr(record_value['uuid']))
 		else:
-			object2UUID = object2[CDM_UUID]
+			object2UUID = object2[constants.CDM_UUID]
 			values['dstUUID'] = object2UUID
 
 		values['bidirectional'] = False
 			
-	elif type_value == 'EVENT_MODIFY_FILE_ATTRIBUTES':
+	elif type_value == b'EVENT_MODIFY_FILE_ATTRIBUTES':
 		# Subject -> Object
 		subject = record_value['subject']
 		if type(subject).__name__ == 'NoneType':
 			logging.debug("EVENT_MODIFY_FILE_ATTRIBUTES: subject does not exist. Event ID: " + repr(record_value['uuid']))
 		else:
-			subjectUUID = subject[CDM_UUID]
+			subjectUUID = subject[constants.CDM_UUID]
 			values['srcUUID'] = subjectUUID
 
 		object1 = record_value['predicateObject']
 		if type(object1).__name__ == 'NoneType':
 			logging.debug("EVENT_MODIFY_FILE_ATTRIBUTES: object does not exist. Event ID: " + repr(record_value['uuid']))
 		else:
-			object1UUID = object1[CDM_UUID]
+			object1UUID = object1[constants.CDM_UUID]
 			values['dstUUID'] = object1UUID
 
 		values['bidirectional'] = False
 
-	elif type_value == 'EVENT_TRUNCATE':
+	elif type_value == b'EVENT_TRUNCATE':
 		# Subject -> Object
 		subject = record_value['subject']
 		if type(subject).__name__ == 'NoneType':
 			logging.debug("EVENT_TRUNCATE: subject does not exist. Event ID: " + repr(record_value['uuid']))
 		else:
-			subjectUUID = subject[CDM_UUID]
+			subjectUUID = subject[constants.CDM_UUID]
 			values['srcUUID'] = subjectUUID
 
 		object1 = record_value['predicateObject']
 		if type(object1).__name__ == 'NoneType':
 			logging.debug("EVENT_TRUNCATE: object does not exist. Event ID: " + repr(record_value['uuid']))
 		else:
-			object1UUID = object1[CDM_UUID]
+			object1UUID = object1[constants.CDM_UUID]
 			values['dstUUID'] = object1UUID
 
 		values['bidirectional'] = False
 
-	elif type_value == 'EVENT_EXIT':
+	elif type_value == b'EVENT_EXIT':
 		# non-directional
 		pass
-	elif type_value == 'EVENT_LINK':
+	elif type_value == b'EVENT_LINK':
 		# Object1 -> Object2
 		object1 = record_value['predicateObject']
 		if type(object1).__name__ == 'NoneType':
 			logging.debug("EVENT_LINK: object1 does not exist. Event ID: " + repr(record_value['uuid']))
 			# raise ValueError("EVENT_LINK: object1 must exist.")
 		else:
-			object1UUID = object1[CDM_UUID]
+			object1UUID = object1[constants.CDM_UUID]
 			values['srcUUID'] = object1UUID
 
 		object2 = record_value['predicateObject2']
@@ -705,73 +688,73 @@ def process_cdm_event(record_value, input_format):
 			logging.debug("EVENT_LINK: object2 does not exist. Event ID: " + repr(record_value['uuid']))
 			# raise ValueError("EVENT_LINK: object2 must exist.")
 		else:
-			object2UUID = object2[CDM_UUID]
+			object2UUID = object2[constants.CDM_UUID]
 			values['dstUUID'] = object2UUID
 
 		values['bidirectional'] = False
 
-	elif type_value == 'EVENT_UNLINK':
+	elif type_value == b'EVENT_UNLINK':
 		# Subject -> Object
 		subject = record_value['subject']
 		if type(subject).__name__ == 'NoneType':
 			logging.debug("EVENT_UNLINK: subject does not exist. Event ID: " + repr(record_value['uuid']))
 		else:
-			subjectUUID = subject[CDM_UUID]
+			subjectUUID = subject[constants.CDM_UUID]
 			values['srcUUID'] = subjectUUID
 
 		object1 = record_value['predicateObject']
 		if type(object1).__name__ == 'NoneType':
 			logging.debug("EVENT_UNLINK: object does not exist. Event ID: " + repr(record_value['uuid']))
 		else:
-			object1UUID = object1[CDM_UUID]
+			object1UUID = object1[constants.CDM_UUID]
 			values['dstUUID'] = object1UUID
 
 		values['bidirectional'] = False
 
-	elif type_value == 'EVENT_RECVMSG':
+	elif type_value == b'EVENT_RECVMSG':
 		# Object -> Subject
 		subject = record_value['subject']
 		if type(subject).__name__ == 'NoneType':
 			logging.debug("EVENT_RECVMSG: subject does not exist. Event ID: " + repr(record_value['uuid']))
 		else:
-			subjectUUID = subject[CDM_UUID]
+			subjectUUID = subject[constants.CDM_UUID]
 			values['dstUUID'] = subjectUUID
 
 		object1 = record_value['predicateObject']
 		if type(object1).__name__ == 'NoneType':
 			logging.debug("EVENT_RECVMSG: object does not exist. Event ID: " + repr(record_value['uuid']))
 		else:
-			object1UUID = object1[CDM_UUID]
+			object1UUID = object1[constants.CDM_UUID]
 			values['srcUUID'] = object1UUID
 
 		values['bidirectional'] = False
 
-	elif type_value == 'EVENT_RENAME':
+	elif type_value == b'EVENT_RENAME':
 		# Object1 -> Object2
 		object1 = record_value['predicateObject']
 		if type(object1).__name__ == 'NoneType':
 			logging.debug("EVENT_RENAME: object1 does not exist. Event ID: " + repr(record_value['uuid']))
 		else:
-			object1UUID = object1[CDM_UUID]
+			object1UUID = object1[constants.CDM_UUID]
 			values['srcUUID'] = object1UUID
 
 		object2 = record_value['predicateObject2']
 		if type(object2).__name__ == 'NoneType':
 			logging.debug("EVENT_RENAME: object2 does not exist. Event ID: " + repr(record_value['uuid']))
 		else:
-			object2UUID = object2[CDM_UUID]
+			object2UUID = object2[constants.CDM_UUID]
 			values['dstUUID'] = object2UUID
 
 		values['bidirectional'] = False
 
-	elif type_value == 'EVENT_SIGNAL':
+	elif type_value == b'EVENT_SIGNAL':
 		# Subject -> Object
 		subject = record_value['subject']
 		if type(subject).__name__ == 'NoneType':
 			logging.debug("EVENT_SIGNAL: subject does not exist. Event ID: " + repr(record_value['uuid']))
 			# raise ValueError("EVENT_SIGNAL: subject must exist.")
 		else:
-			subjectUUID = subject[CDM_UUID]
+			subjectUUID = subject[constants.CDM_UUID]
 			values['srcUUID'] = subjectUUID
 
 		object1 = record_value['predicateObject']
@@ -779,19 +762,19 @@ def process_cdm_event(record_value, input_format):
 			logging.debug("EVENT_SIGNAL: object does not exist. Event ID: " + repr(record_value['uuid']))
 			# raise ValueError("EVENT_SIGNAL: object must exist.")
 		else:
-			object1UUID = object1[CDM_UUID]
+			object1UUID = object1[constants.CDM_UUID]
 			values['dstUUID'] = object1UUID
 
 		values['bidirectional'] = False
 
-	elif type_value == 'EVENT_MPROTECT':
+	elif type_value == b'EVENT_MPROTECT':
 		# Subject -> Object
 		subject = record_value['subject']
 		if type(subject).__name__ == 'NoneType':
 			logging.debug("EVENT_MPROTECT: subject does not exist. Event ID: " + repr(record_value['uuid']))
 			# raise ValueError("EVENT_MPROTECT: subject must exist.")
 		else:
-			subjectUUID = subject[CDM_UUID]
+			subjectUUID = subject[constants.CDM_UUID]
 			values['srcUUID'] = subjectUUID
 
 		object1 = record_value['predicateObject']
@@ -799,37 +782,37 @@ def process_cdm_event(record_value, input_format):
 			logging.debug("EVENT_MPROTECT: object does not exist. Event ID: " + repr(record_value['uuid']))
 			# raise ValueError("EVENT_MPROTECT: object must exist.")
 		else:
-			object1UUID = object1[CDM_UUID]
+			object1UUID = object1[constants.CDM_UUID]
 			values['dstUUID'] = object1UUID
 
 		values['bidirectional'] = False
 		
-	elif type_value == 'EVENT_SENDMSG':
+	elif type_value == b'EVENT_SENDMSG':
 		# Subject -> Object
 		subject = record_value['subject']
 		if type(subject).__name__ == 'NoneType':
 			logging.debug("EVENT_SENDMSG: subject does not exist. Event ID: " + repr(record_value['uuid']))
 		else:
-			subjectUUID = subject[CDM_UUID]
+			subjectUUID = subject[constants.CDM_UUID]
 			values['srcUUID'] = subjectUUID
 
 		object1 = record_value['predicateObject']
 		if type(object1).__name__ == 'NoneType':
 			logging.debug("EVENT_SENDMSG: object does not exist. Event ID: " + repr(record_value['uuid']))
 		else:
-			object1UUID = object1[CDM_UUID]
+			object1UUID = object1[constants.CDM_UUID]
 			values['dstUUID'] = object1UUID
 
 		values['bidirectional'] = False
 		
-	elif type_value == 'EVENT_OTHER':
+	elif type_value == b'EVENT_OTHER':
 		# Subject <-> Object
 		subject = record_value['subject']
 		if type(subject).__name__ == 'NoneType':
 			logging.debug("EVENT_OTHER: subject does not exist. Event ID: " + repr(record_value['uuid']))
 			# raise ValueError("EVENT_OTHER: subject must exist.")
 		else:
-			subjectUUID = subject[CDM_UUID]
+			subjectUUID = subject[constants.CDM_UUID]
 			values['srcUUID'] = subjectUUID
 
 		object1 = record_value['predicateObject']
@@ -837,161 +820,161 @@ def process_cdm_event(record_value, input_format):
 			logging.debug("EVENT_OTHER: object does not exist. Event ID: " + repr(record_value['uuid']))
 			# raise ValueError("EVENT_OTHER: object must exist.")
 		else:
-			object1UUID = object1[CDM_UUID]
+			object1UUID = object1[constants.CDM_UUID]
 			values['dstUUID'] = object1UUID
 
 		values['bidirectional'] = True
 		
-	elif type_value == 'EVENT_FLOWS_TO':
+	elif type_value == b'EVENT_FLOWS_TO':
 		# Object1 -> Object2
 		object1 = record_value['predicateObject']
 		if type(object1).__name__ == 'NoneType':
 			logging.debug("EVENT_FLOWS_TO: object1 does not exist. Event ID: " + repr(record_value['uuid']))
 		else:
-			object1UUID = object1[CDM_UUID]
+			object1UUID = object1[constants.CDM_UUID]
 			values['srcUUID'] = object1UUID
 
 		object2 = record_value['predicateObject2']
 		if type(object2).__name__ == 'NoneType':
 			logging.debug("EVENT_FLOWS_TO: object2 does not exist. Event ID: " + repr(record_value['uuid']))
 		else:
-			object2UUID = object2[CDM_UUID]
+			object2UUID = object2[constants.CDM_UUID]
 			values['dstUUID'] = object2UUID
 
 		values['bidirectional'] = False
 
-	elif type_value == 'EVENT_BIND':
+	elif type_value == b'EVENT_BIND':
 		# Subject -> Object
 		subject = record_value['subject']
 		if type(subject).__name__ == 'NoneType':
 			logging.debug("EVENT_BIND: subject does not exist. Event ID: " + repr(record_value['uuid']))
 		else:
-			subjectUUID = subject[CDM_UUID]
+			subjectUUID = subject[constants.CDM_UUID]
 			values['srcUUID'] = subjectUUID
 
 		object1 = record_value['predicateObject']
 		if type(object1).__name__ == 'NoneType':
 			logging.debug("EVENT_BIND: object does not exist. Event ID: " + repr(record_value['uuid']))
 		else:
-			object1UUID = object1[CDM_UUID]
+			object1UUID = object1[constants.CDM_UUID]
 			values['dstUUID'] = object1UUID
 
 		values['bidirectional'] = False
 		
 	# clearscope
-	elif type_value == 'EVENT_DUP':
+	elif type_value == b'EVENT_DUP':
 		# non-directional
 		pass
-	elif type_value == 'EVENT_CHECK_FILE_ATTRIBUTES':
+	elif type_value == b'EVENT_CHECK_FILE_ATTRIBUTES':
 		# Object -> Subject
 		subject = record_value['subject']
 		if type(subject).__name__ == 'NoneType':
 			logging.debug("EVENT_CHECK_FILE_ATTRIBUTES: subject does not exist. Event ID: " + repr(record_value['uuid']))
 		else:
-			subjectUUID = subject[CDM_UUID]
+			subjectUUID = subject[constants.CDM_UUID]
 			values['dstUUID'] = subjectUUID
 
 		object1 = record_value['predicateObject']
 		if type(object1).__name__ == 'NoneType':
 			logging.debug("EVENT_CHECK_FILE_ATTRIBUTES: object does not exist. Event ID: " + repr(record_value['uuid']))
 		else:
-			object1UUID = object1[CDM_UUID]
+			object1UUID = object1[constants.CDM_UUID]
 			values['srcUUID'] = object1UUID
 
 		values['bidirectional'] = False
 
-	elif type_value == 'EVENT_WRITE_SOCKET_PARAMS':
+	elif type_value == b'EVENT_WRITE_SOCKET_PARAMS':
 		# Subject -> Object
 		subject = record_value['subject']
 		if type(subject).__name__ == 'NoneType':
 			logging.debug("EVENT_WRITE_SOCKET_PARAMS: subject does not exist. Event ID: " + repr(record_value['uuid']))
 		else:
-			subjectUUID = subject[CDM_UUID]
+			subjectUUID = subject[constants.CDM_UUID]
 			values['srcUUID'] = subjectUUID
 
 		object1 = record_value['predicateObject']
 		if type(object1).__name__ == 'NoneType':
 			logging.debug("EVENT_WRITE_SOCKET_PARAMS: object does not exist. Event ID: " + repr(record_value['uuid']))
 		else:
-			object1UUID = object1[CDM_UUID]
+			object1UUID = object1[constants.CDM_UUID]
 			values['dstUUID'] = object1UUID
 
 		values['bidirectional'] = False
 		
-	elif type_value == 'EVENT_READ_SOCKET_PARAMS':
+	elif type_value == b'EVENT_READ_SOCKET_PARAMS':
 		# Object -> Subject
 		subject = record_value['subject']
 		if type(subject).__name__ == 'NoneType':
 			logging.debug("EVENT_READ_SOCKET_PARAMS: subject does not exist. Event ID: " + repr(record_value['uuid']))
 		else:
-			subjectUUID = subject[CDM_UUID]
+			subjectUUID = subject[constants.CDM_UUID]
 			values['dstUUID'] = subjectUUID
 
 		object1 = record_value['predicateObject']
 		if type(object1).__name__ == 'NoneType':
 			logging.debug("EVENT_READ_SOCKET_PARAMS: object does not exist. Event ID: " + repr(record_value['uuid']))
 		else:
-			object1UUID = object1[CDM_UUID]
+			object1UUID = object1[constants.CDM_UUID]
 			values['srcUUID'] = object1UUID
 
 		values['bidirectional'] = False
 
 	# fivedirections
-	elif type_value == 'EVENT_UPDATE':
+	elif type_value == b'EVENT_UPDATE':
 		# Object1 -> Object2
 		object1 = record_value['predicateObject']
 		if type(object1).__name__ == 'NoneType':
 			logging.debug("EVENT_UPDATE: object1 does not exist. Event ID: " + repr(record_value['uuid']))
 		else:
-			object1UUID = object1[CDM_UUID]
+			object1UUID = object1[constants.CDM_UUID]
 			values['srcUUID'] = object1UUID
 
 		object2 = record_value['predicateObject2']
 		if type(object2).__name__ == 'NoneType':
 			logging.debug("EVENT_UPDATE: object2 does not exist. Event ID: " + repr(record_value['uuid']))
 		else:
-			object2UUID = object2[CDM_UUID]
+			object2UUID = object2[constants.CDM_UUID]
 			values['dstUUID'] = object2UUID
 
 		values['bidirectional'] = False
 
-	elif type_value == 'EVENT_LOADLIBRARY':
+	elif type_value == b'EVENT_LOADLIBRARY':
 		# Object -> Subject
 		subject = record_value['subject']
 		if type(subject).__name__ == 'NoneType':
 			logging.debug("EVENT_LOADLIBRARY: subject does not exist. Event ID: " + repr(record_value['uuid']))
 		else:
-			subjectUUID = subject[CDM_UUID]
+			subjectUUID = subject[constants.CDM_UUID]
 			values['dstUUID'] = subjectUUID
 
 		object1 = record_value['predicateObject']
 		if type(object1).__name__ == 'NoneType':
 			logging.debug("EVENT_LOADLIBRARY: object does not exist. Event ID: " + repr(record_value['uuid']))
 		else:
-			object1UUID = object1[CDM_UUID]
+			object1UUID = object1[constants.CDM_UUID]
 			values['srcUUID'] = object1UUID
 
 		values['bidirectional'] = False
 		
-	elif type_value == 'EVENT_CREATE_THREAD':
+	elif type_value == b'EVENT_CREATE_THREAD':
 		# Subject -> Object
 		subject = record_value['subject']
 		if type(subject).__name__ == 'NoneType':
 			logging.debug("EVENT_CREATE_THREAD: subject does not exist. Event ID: " + repr(record_value['uuid']))
 		else:
-			subjectUUID = subject[CDM_UUID]
+			subjectUUID = subject[constants.CDM_UUID]
 			values['srcUUID'] = subjectUUID
 
 		object1 = record_value['predicateObject']
 		if type(object1).__name__ == 'NoneType':
 			logging.debug("EVENT_CREATE_THREAD: object does not exist. Event ID: " + repr(record_value['uuid']))
 		else:
-			object1UUID = object1[CDM_UUID]
+			object1UUID = object1[constants.CDM_UUID]
 			values['dstUUID'] = object1UUID
 
 		values['bidirectional'] = False
 		
-	elif type_value == 'EVENT_LOGOUT':
+	elif type_value == b'EVENT_LOGOUT':
 		# Subject -> Object
 		# TODO:
 		# The relation needs confirmation.
@@ -999,99 +982,99 @@ def process_cdm_event(record_value, input_format):
 		if type(subject).__name__ == 'NoneType':
 			logging.debug("EVENT_LOGOUT: subject does not exist. Event ID: " + repr(record_value['uuid']))
 		else:
-			subjectUUID = subject[CDM_UUID]
+			subjectUUID = subject[constants.CDM_UUID]
 			values['srcUUID'] = subjectUUID
 
 		object1 = record_value['predicateObject']
 		if type(object1).__name__ == 'NoneType':
 			logging.debug("EVENT_LOGOUT: object does not exist. Event ID: " + repr(record_value['uuid']))
 		else:
-			object1UUID = object1[CDM_UUID]
+			object1UUID = object1[constants.CDM_UUID]
 			values['dstUUID'] = object1UUID
 
 		values['bidirectional'] = False
 		
 	# theia
-	elif type_value == 'EVENT_BOOT':
+	elif type_value == b'EVENT_BOOT':
 		# non-directional
 		pass
-	elif type_value == 'EVENT_CLONE':
+	elif type_value == b'EVENT_CLONE':
 		# Subject -> Object
 		subject = record_value['subject']
 		if type(subject).__name__ == 'NoneType':
 			logging.debug("EVENT_CLONE: subject does not exist. Event ID: " + repr(record_value['uuid']))
 		else:
-			subjectUUID = subject[CDM_UUID]
+			subjectUUID = subject[constants.CDM_UUID]
 			values['srcUUID'] = subjectUUID
 
 		object1 = record_value['predicateObject']
 		if type(object1).__name__ == 'NoneType':
 			logging.debug("EVENT_CLONE: object does not exist. Event ID: " + repr(record_value['uuid']))
 		else:
-			object1UUID = object1[CDM_UUID]
+			object1UUID = object1[constants.CDM_UUID]
 			values['dstUUID'] = object1UUID
 
 		values['bidirectional'] = False
 
-	elif type_value == 'EVENT_SHM':
+	elif type_value == b'EVENT_SHM':
 		# Object1 -> Object2
 		object1 = record_value['predicateObject']
 		if type(object1).__name__ == 'NoneType':
 			logging.debug("EVENT_SHM: object1 does not exist. Event ID: " + repr(record_value['uuid']))
 		else:
-			object1UUID = object1[CDM_UUID]
+			object1UUID = object1[constants.CDM_UUID]
 			values['srcUUID'] = object1UUID
 
 		object2 = record_value['predicateObject2']
 		if type(object2).__name__ == 'NoneType':
 			logging.debug("EVENT_SHM: object2 does not exist. Event ID: " + repr(record_value['uuid']))
 		else:
-			object2UUID = object2[CDM_UUID]
+			object2UUID = object2[constants.CDM_UUID]
 			values['dstUUID'] = object2UUID
 
 		values['bidirectional'] = False
 
 	# trace
-	elif type_value == 'EVENT_UNIT':
+	elif type_value == b'EVENT_UNIT':
 		# Subject -> Object
 		subject = record_value['subject']
 		if type(subject).__name__ == 'NoneType':
 			logging.debug("EVENT_UNIT: subject does not exist. Event ID: " + repr(record_value['uuid']))
 		else:
-			subjectUUID = subject[CDM_UUID]
+			subjectUUID = subject[constants.CDM_UUID]
 			values['srcUUID'] = subjectUUID
 
 		object1 = record_value['predicateObject']
 		if type(object1).__name__ == 'NoneType':
 			logging.debug("EVENT_UNIT: object does not exist. Event ID: " + repr(record_value['uuid']))
 		else:
-			object1UUID = object1[CDM_UUID]
+			object1UUID = object1[constants.CDM_UUID]
 			values['dstUUID'] = object1UUID
 
 		values['bidirectional'] = False
 	# others
-	elif type_value == 'EVENT_BLIND':
+	elif type_value == b'EVENT_BLIND':
 		pass
 
-	elif type_value == 'EVENT_CORRELATION':
+	elif type_value == b'EVENT_CORRELATION':
 		# Object1 -> Object2
 		object1 = record_value['predicateObject']
 		if type(object1).__name__ == 'NoneType':
 			logging.debug("EVENT_CORRELATION: object1 does not exist. Event ID: " + repr(record_value['uuid']))
 		else:
-			object1UUID = object1[CDM_UUID]
+			object1UUID = object1[constants.CDM_UUID]
 			values['srcUUID'] = object1UUID
 
 		object2 = record_value['predicateObject2']
 		if type(object2).__name__ == 'NoneType':
 			logging.debug("EVENT_CORRELATION: object2 does not exist. Event ID: " + repr(record_value['uuid']))
 		else:
-			object2UUID = object2[CDM_UUID]
+			object2UUID = object2[constants.CDM_UUID]
 			values['dstUUID'] = object2UUID
 
 		values['bidirectional'] = False
 
-	elif type_value == 'EVENT_LOGCLEAR':
+	elif type_value == b'EVENT_LOGCLEAR':
 		# Subject -> Object
 		# TODO:
 		# The relation needs confirmation.
@@ -1099,116 +1082,116 @@ def process_cdm_event(record_value, input_format):
 		if type(subject).__name__ == 'NoneType':
 			logging.debug("EVENT_LOGCLEAR: subject does not exist. Event ID: " + repr(record_value['uuid']))
 		else:
-			subjectUUID = subject[CDM_UUID]
+			subjectUUID = subject[constants.CDM_UUID]
 			values['srcUUID'] = subjectUUID
 
 		object1 = record_value['predicateObject']
 		if type(object1).__name__ == 'NoneType':
 			logging.debug("EVENT_LOGCLEAR: object does not exist. Event ID: " + repr(record_value['uuid']))
 		else:
-			object1UUID = object1[CDM_UUID]
+			object1UUID = object1[constants.CDM_UUID]
 			values['dstUUID'] = object1UUID
 
 		values['bidirectional'] = False
 
-	elif type_value == 'EVENT_MOUNT':
+	elif type_value == b'EVENT_MOUNT':
 		# Subject -> Object
 		subject = record_value['subject']
 		if type(subject).__name__ == 'NoneType':
 			logging.debug("EVENT_MOUNT: subject does not exist. Event ID: " + repr(record_value['uuid']))
 		else:
-			subjectUUID = subject[CDM_UUID]
+			subjectUUID = subject[constants.CDM_UUID]
 			values['srcUUID'] = subjectUUID
 
 		object1 = record_value['predicateObject']
 		if type(object1).__name__ == 'NoneType':
 			logging.debug("EVENT_MOUNT: object does not exist. Event ID: " + repr(record_value['uuid']))
 		else:
-			object1UUID = object1[CDM_UUID]
+			object1UUID = object1[constants.CDM_UUID]
 			values['dstUUID'] = object1UUID
 
 		values['bidirectional'] = False
 
-	elif type_value == 'EVENT_SERVICEINSTALL':
+	elif type_value == b'EVENT_SERVICEINSTALL':
 		# Subject -> Object
 		subject = record_value['subject']
 		if type(subject).__name__ == 'NoneType':
 			logging.debug("EVENT_SERVICEINSTALL: subject does not exist. Event ID: " + repr(record_value['uuid']))
 		else:
-			subjectUUID = subject[CDM_UUID]
+			subjectUUID = subject[constants.CDM_UUID]
 			values['srcUUID'] = subjectUUID
 
 		object1 = record_value['predicateObject']
 		if type(object1).__name__ == 'NoneType':
 			logging.debug("EVENT_SERVICEINSTALL: object does not exist. Event ID: " + repr(record_value['uuid']))
 		else:
-			object1UUID = object1[CDM_UUID]
+			object1UUID = object1[constants.CDM_UUID]
 			values['dstUUID'] = object1UUID
 
 		values['bidirectional'] = False
 
-	elif type_value == 'EVENT_STARTSERVICE':
+	elif type_value == b'EVENT_STARTSERVICE':
 		# Subject -> Object
 		subject = record_value['subject']
 		if type(subject).__name__ == 'NoneType':
 			logging.debug("EVENT_STARTSERVICE: subject does not exist. Event ID: " + repr(record_value['uuid']))
 		else:
-			subjectUUID = subject[CDM_UUID]
+			subjectUUID = subject[constants.CDM_UUID]
 			values['srcUUID'] = subjectUUID
 
 		object1 = record_value['predicateObject']
 		if type(object1).__name__ == 'NoneType':
 			logging.debug("EVENT_STARTSERVICE: object does not exist. Event ID: " + repr(record_value['uuid']))
 		else:
-			object1UUID = object1[CDM_UUID]
+			object1UUID = object1[constants.CDM_UUID]
 			values['dstUUID'] = object1UUID
 
 		values['bidirectional'] = False
 
-	elif type_value == 'EVENT_UMOUNT':
+	elif type_value == b'EVENT_UMOUNT':
 		# Subject -> Object
 		subject = record_value['subject']
 		if type(subject).__name__ == 'NoneType':
 			logging.debug("EVENT_UMOUNT: subject does not exist. Event ID: " + repr(record_value['uuid']))
 		else:
-			subjectUUID = subject[CDM_UUID]
+			subjectUUID = subject[constants.CDM_UUID]
 			values['srcUUID'] = subjectUUID
 
 		object1 = record_value['predicateObject']
 		if type(object1).__name__ == 'NoneType':
 			logging.debug("EVENT_UMOUNT: object does not exist. Event ID: " + repr(record_value['uuid']))
 		else:
-			object1UUID = object1[CDM_UUID]
+			object1UUID = object1[constants.CDM_UUID]
 			values['dstUUID'] = object1UUID
 
 		values['bidirectional'] = False
 
-	elif type_value == 'EVENT_WAIT':
+	elif type_value == b'EVENT_WAIT':
 		# Object -> Subject
 		subject = record_value['subject']
 		if type(subject).__name__ == 'NoneType':
 			logging.debug("EVENT_WAIT: subject does not exist. Event ID: " + repr(record_value['uuid']))
 		else:
-			subjectUUID = subject[CDM_UUID]
+			subjectUUID = subject[constants.CDM_UUID]
 			values['dstUUID'] = subjectUUID
 
 		object1 = record_value['predicateObject']
 		if type(object1).__name__ == 'NoneType':
 			logging.debug("EVENT_WAIT: object does not exist. Event ID: " + repr(record_value['uuid']))
 		else:
-			object1UUID = object1[CDM_UUID]
+			object1UUID = object1[constants.CDM_UUID]
 			values['srcUUID'] = object1UUID
 
 		values['bidirectional'] = False
 
 	else:
 		print(record_value)
-		raise KeyError('CDM_TYPE_EVENT: type is undefined.')
+		raise KeyError('constants.CDM_TYPE_EVENT: type is undefined.')
 
 	return values
 
 def process_cdm_principal(record_value, input_format, nid):
-	"""Process CDM record typed CDM_TYPE_PRINCIPAL.
+	"""Process CDM record typed constants.CDM_TYPE_PRINCIPAL.
 
 	values = {'nid', 'type'}
 	"""
@@ -1216,7 +1199,7 @@ def process_cdm_principal(record_value, input_format, nid):
 	values['nid'] = nid
 
 	if 'type' not in record_value:
-		raise KeyError('CDM_TYPE_PRINCIPAL: type is missing.')
+		raise KeyError('constants.CDM_TYPE_PRINCIPAL: type is missing.')
 	type_value = read_field(record_value['type'], input_format)
 	values['type'] = type_value
 
@@ -1227,12 +1210,12 @@ def process_cdm_principal(record_value, input_format, nid):
 		pass
 	else:
 		pass
-		# raise KeyError('CDM_TYPE_PRINCIPAL: type is undefined.')
+		# raise KeyError('constants.CDM_TYPE_PRINCIPAL: type is undefined.')
 
 	return values
 
 def process_cdm_host(record_value, input_format, nid):
-	"""Process CDM record typed CDM_TYPE_HOST.
+	"""Process CDM record typed constants.CDM_TYPE_HOST.
 
 	values = {'nid', 'type'}
 	"""
@@ -1240,7 +1223,7 @@ def process_cdm_host(record_value, input_format, nid):
 	values['nid'] = nid
 
 	if 'hostType' not in record_value:
-		raise KeyError('CDM_TYPE_HOST: host type is missing.')
+		raise KeyError('constants.CDM_TYPE_HOST: host type is missing.')
 	type_value = read_field(record_value['hostType'], input_format)
 	values['type'] = type_value
 	
@@ -1251,19 +1234,19 @@ def process_cdm_host(record_value, input_format, nid):
 		pass
 	else:
 		pass
-		# raise KeyError('CDM_TYPE_HOST: host type is undefined.')
+		# raise KeyError('constants.CDM_TYPE_HOST: host type is undefined.')
 
 	return values
 
 def process_cdm_memory(record_value, input_format, nid):
-	"""Process CDM record typed CDM_TYPE_MEMORY.
+	"""Process CDM record typed constants.CDM_TYPE_MEMORY.
 
 	values = {'nid', 'type'}
 	"""
 	values = dict()
 	values['nid'] = nid
 	# type must be a MEMORY_OBJECT
-	values['type'] = 'MEMORY_OBJECT'
+	values['type'] = b'MEMORY_OBJECT'
 	
 	# Currently, no other type-specific or type-general values to be appended as of 01-05-19.
 	return values
@@ -1279,10 +1262,13 @@ def generate_output(nodes, fh, fp):
 			raise NotImplementedError('CDM avro format is not supported as of 01-04-09.')
 		elif input_format == 'json':
 			cdm_record = json.loads(line.strip())
-			cdm_record_type = cdm_record['datum'].keys()[0]
+			if sys.version_info[0] < 3:
+				cdm_record_type = cdm_record['datum'].keys()[0]
+			else:
+				cdm_record_type = list(cdm_record['datum'].keys())[0]
 			cdm_record_value = cdm_record['datum'][cdm_record_type]
 
-		if cdm_record_type == CDM_TYPE_EVENT:
+		if cdm_record_type == constants.CDM_TYPE_EVENT:
 			# We don't really care about UUIDs of the edges.
 			# But for debugging purposes, we put them in a set
 			# to make sure we don't see two edges with the same UUIDs
@@ -1291,7 +1277,6 @@ def generate_output(nodes, fh, fp):
 			if uuid in edgeUUID:
 				logging.debug('CDM_TYPE_EVENT: UUID is not unique. UUID: ' + repr(uuid))
 			edgeUUID.add(uuid)
-
 			values = process_cdm_event(cdm_record_value, input_format)
 
 			# TODO:
@@ -1348,28 +1333,31 @@ for data_file in files:
 				raise NotImplementedError('CDM avro format is not supported as of 01-04-09.')
 			elif input_format == 'json':
 				cdm_record = json.loads(line.strip())
-				cdm_record_type = cdm_record['datum'].keys()[0]
+				if sys.version_info[0] < 3:
+					cdm_record_type = cdm_record['datum'].keys()[0]
+				else:
+					cdm_record_type = list(cdm_record['datum'].keys())[0]
 				cdm_record_value = cdm_record['datum'][cdm_record_type]
 				
-			if cdm_record_type == CDM_TYPE_SRCSINK:
+			if cdm_record_type == constants.CDM_TYPE_SRCSINK:
 				uuid = cdm_record_value['uuid']
 				values = process_cdm_srcsink(cdm_record_value, input_format, next_id)
 
 				if uuid in nodes:
-					logging.debug('CDM_TYPE_SRCSINK: UUID is not unique. UUID: ' + repr(uuid))
+					logging.debug('constants.CDM_TYPE_SRCSINK: UUID is not unique. UUID: ' + repr(uuid))
 				nodes[uuid] = values
 				next_id += 1
 
-			elif cdm_record_type == CDM_TYPE_SUBJECT:
+			elif cdm_record_type == constants.CDM_TYPE_SUBJECT:
 				uuid = cdm_record_value['uuid']
 				values = process_cdm_subject(cdm_record_value, input_format, next_id)
 
 				if uuid in nodes:
-					logging.debug('CDM_TYPE_SUBJECT: UUID is not unique. UUID: ' + repr(uuid))
+					logging.debug('constants.CDM_TYPE_SUBJECT: UUID is not unique. UUID: ' + repr(uuid))
 				nodes[uuid] = values
 				next_id += 1
 
-			elif cdm_record_type == CDM_TYPE_FILE:
+			elif cdm_record_type == constants.CDM_TYPE_FILE:
 				uuid = cdm_record_value['uuid']
 				values = process_cdm_file(cdm_record_value, input_format, next_id)
 				
@@ -1381,73 +1369,73 @@ for data_file in files:
 					if nodeUUID == cdm_record_value['uuid']:
 						continue	# if simply because identical records, we just drop the record
 					else:	# if collision occurs
-						logging.debug('CDM_TYPE_FILE: UUID is not unique. UUID: ' + repr(uuid))
+						logging.debug('constants.CDM_TYPE_FILE: UUID is not unique. UUID: ' + repr(uuid))
 				nodes[uuid] = values
 				next_id += 1
 
-			elif cdm_record_type == CDM_TYPE_SOCK:
+			elif cdm_record_type == constants.CDM_TYPE_SOCK:
 				uuid = cdm_record_value['uuid']
 				values = process_cdm_sock(cdm_record_value, input_format, next_id)
 
 				if uuid in nodes:
-					logging.debug('CDM_TYPE_SOCK: UUID is not unique. UUID: ' + repr(uuid))
+					logging.debug('constants.CDM_TYPE_SOCK: UUID is not unique. UUID: ' + repr(uuid))
 				nodes[uuid] = values
 				next_id += 1
 
-			elif cdm_record_type == CDM_TYPE_PIPE:
+			elif cdm_record_type == constants.CDM_TYPE_PIPE:
 				uuid = cdm_record_value['uuid']
 				values = process_cdm_pipe(cdm_record_value, input_format, next_id)
 
 				if uuid in nodes:
-					logging.debug('CDM_TYPE_PIPE: UUID is not unique. UUID: ' + repr(uuid))
+					logging.debug('constants.CDM_TYPE_PIPE: UUID is not unique. UUID: ' + repr(uuid))
 				nodes[uuid] = values
 				next_id += 1
 
 				# TODO:
 				# Do we consider PIPE an edge or a vertex?
 
-			elif cdm_record_type == CDM_TYPE_EVENT:
+			elif cdm_record_type == constants.CDM_TYPE_EVENT:
 				pass
 
-			elif cdm_record_type == CDM_TYPE_PRINCIPAL:
+			elif cdm_record_type == constants.CDM_TYPE_PRINCIPAL:
 				uuid = cdm_record_value['uuid']
 				values = process_cdm_principal(cdm_record_value, input_format, next_id)
 
 				if uuid in nodes:
-					logging.debug('CDM_TYPE_PRINCIPAL: UUID is not unique. UUID: ' + repr(uuid))
+					logging.debug('constants.CDM_TYPE_PRINCIPAL: UUID is not unique. UUID: ' + repr(uuid))
 				nodes[uuid] = values
 				next_id += 1
 			# clearscope
-			elif cdm_record_type == CDM_TYPE_TAG:
+			elif cdm_record_type == constants.CDM_TYPE_TAG:
 				pass
 			# fivedirections
-			elif cdm_record_type == CDM_TYPE_STARTMARKER:
+			elif cdm_record_type == constants.CDM_TYPE_STARTMARKER:
 				pass
-			elif cdm_record_type == CDM_TYPE_TIMEMARKER:
+			elif cdm_record_type == constants.CDM_TYPE_TIMEMARKER:
 				pass
-			elif cdm_record_type == CDM_TYPE_HOST:
+			elif cdm_record_type == constants.CDM_TYPE_HOST:
 				uuid = cdm_record_value['uuid']
 				values = process_cdm_host(cdm_record_value, input_format, next_id)
 
 				if uuid in nodes:
-					logging.debug('CDM_TYPE_HOST: UUID is not unique. UUID: ' + repr(uuid))
+					logging.debug('constants.CDM_TYPE_HOST: UUID is not unique. UUID: ' + repr(uuid))
 				nodes[uuid] = values
 				next_id += 1
 
-			elif cdm_record_type == CDM_TYPE_KEY:
+			elif cdm_record_type == constants.CDM_TYPE_KEY:
 				pass
-			elif cdm_record_type == CDM_TYPE_MEMORY:
+			elif cdm_record_type == constants.CDM_TYPE_MEMORY:
 				uuid = cdm_record_value['uuid']
 				values = process_cdm_memory(cdm_record_value, input_format, next_id)
 
 				if uuid in nodes:
-					logging.debug('CDM_TYPE_MEMORY: UUID is not unique. UUID: ' + repr(uuid))
+					logging.debug('constants.CDM_TYPE_MEMORY: UUID is not unique. UUID: ' + repr(uuid))
 				nodes[uuid] = values
 				next_id += 1
-			elif cdm_record_type == CDM_TYPE_ENDMARKER:
+			elif cdm_record_type == constants.CDM_TYPE_ENDMARKER:
 				pass
 			# trace
-			elif cdm_record_type == CDM_TYPE_UNITDEPENDENCY:
+			elif cdm_record_type == constants.CDM_TYPE_UNITDEPENDENCY:
 				# TODO
 				# Do we consider this record a type of edge? If so, we should not pass.
 				pass
@@ -1492,7 +1480,7 @@ elif system == 'theia':
 	first = ['theia-e3-1-0.json', 'theia-e3-1-1.json', 'theia-e3-1-2.json', 'theia-e3-1-3.json', 'theia-e3-1-4.json', 'theia-e3-1-5.json', 'theia-e3-1-6.json', 'theia-e3-1-7.json', 'theia-e3-1-8.json', 'theia-e3-1-9.json']
 	second = ['theia-e3-3-0.json']
 	third = ['theia-e3-5-0.json']
-
+	first = ['benign-theia-e3-7.json', 'benign-theia-e3-8.json']
 	out_first = '0-' + output_locat
 	out_second = '1-' + output_locat
 	out_third = '2-' + output_locat
@@ -1501,6 +1489,7 @@ elif system == 'theia':
 		with open(os.path.join(input_source, data_file), 'r') as fh:
 			generate_output(nodes, fh, out_first)
 		fh.close()
+	'''
 	for data_file in second:
 		with open(os.path.join(input_source, data_file), 'r') as fh:
 			generate_output(nodes, fh, out_second)
@@ -1509,6 +1498,7 @@ elif system == 'theia':
 		with open(os.path.join(input_source, data_file), 'r') as fh:
 			generate_output(nodes, fh, out_third)
 		fh.close()
+	'''
 elif system == 'fivedirections':
 	third = ['fivedirections-e3-3.json']
 
