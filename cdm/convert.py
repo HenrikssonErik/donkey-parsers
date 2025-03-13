@@ -1481,7 +1481,7 @@ elif system == 'theia':
 	second = ['theia-e3-3-0.json']
 	third = ['theia-e3-5-0.json']
 	first = ['benign-theia-e3-7.json', 'benign-theia-e3-8.json']
-	out_first = '0-' + output_locat
+	out_first = output_locat #'0-' + output_locat
 	out_second = '1-' + output_locat
 	out_third = '2-' + output_locat
 

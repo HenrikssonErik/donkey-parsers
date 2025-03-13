@@ -53,7 +53,7 @@ if __name__ == "__main__":
 		print("\x1b[6;30;42m[+]\x1b[0m opening stream output file {} to write...".format(args.stream))
 
 	# node ID starts from 1
-	nid = 1
+	nid = 0
 	cnt = 0
 
 	description = '\x1b[6;30;43m[i]\x1b[0m Progress'

@@ -141,6 +141,26 @@ theia_e3:
 		number=`expr $$number + 1` ; \
 	done
 
+rename_files:
+	python renameFiles.py -s ../../../data/theia-e3/attack/edgelists_attack -n theia -o ../../../data/theia-e3/attack/edgelists_attack/theia-e3-official.txt -e txt -l 29 ; \
+
+theia_e3_attack:
+	test -f venv/bin/activate || virtualenv -p $(shell which python) venv
+	venv/bin/pip install tqdm pandas
+	
+	mkdir -p ../../../data/theia-e3/attack/edgelists_attack
+	mkdir -p ../../../data/theia-e3/attack/base
+	mkdir -p ../../../data/theia-e3/attack/stream
+
+
+	number=0 ; while [ $$number -le 27 ] ; do \
+		venv/bin/python ProvParser/provparser/up.py -v -m -S 10000 \
+			-i ../../../data/theia-e3/attack/edgelists_attack/theia-e3-official.txt.$$number \
+			-b ../../../data/theia-e3/attack/base/base-theia-e3-attack-$$number.txt \
+			-s ../../../data/theia-e3/attack/stream/stream-theia-e3-attack-$$number.txt ; \
+		number=`expr $$number + 1` ; \
+	done 
+
 theia_e3_benign:
 	test -f venv/bin/activate || virtualenv -p $(shell which python) venv
 	venv/bin/pip install tqdm pandas
