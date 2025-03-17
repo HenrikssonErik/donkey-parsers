@@ -3,3 +3,4 @@
 *.json
 *.pyc
 venv/
+theia-error.log
