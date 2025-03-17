@@ -1,9 +1,10 @@
+import argparse
 import json, os, subprocess, sys
 from collections import defaultdict
 from datetime import datetime
 
 # Pretty prints each X jsonl objects. Unrefined code.
-def main():
+def pretty_print_object():
     filename =    "../../../../data/atlasv2/data/benign/h1/cbc-edr-alerts/test.jsonl"
     filename = "../../../../data/atlasv2/data/attack/h2/cbc-edr/edr-h2-m1.jsonl"
     output_file = "../../../../data/atlasv2/data/benign/h1/cbc-edr-alerts/output.txt"
@@ -29,7 +30,7 @@ def main():
     f.close()
 
 # Find all process_guids in a file and no of occurences. Unrefined code.
-def getGuid():
+def get_guid():
     filename =    "../../../../data/atlasv2/data/attack/h1/cbc-edr-alerts/edr-alerts-h1-m2.jsonl"
     output_file = "../../../../data/atlasv2/data/attack/h1/cbc-edr-alerts/output/guids2.txt"
 
@@ -51,7 +52,7 @@ def getGuid():
     print(p_guid)
 
 # Matches all actions found in a file against our found actions in parser-info.txt
-def actionPrevFound(date, file, base_dir):
+def action_prev_found(date, file, base_dir):
     actions = f"{base_dir}/output/actions_{file}_{date}.txt"
     found = "../parser-info.txt"
 
@@ -66,7 +67,7 @@ def actionPrevFound(date, file, base_dir):
     print("actionPrevFound: Done")
 
 # Gets all actions in a file and no of occurences. 
-def getActions(date, file, base_dir):
+def get_actions(date, file, base_dir):
     filename = f"{base_dir}/{file}.jsonl"
     output_file = f"{base_dir}/output/actions_{file}_{date}.txt"
 
@@ -94,8 +95,16 @@ def getActions(date, file, base_dir):
         fp.writelines(f"{key}: {value}\n" for key, value in sorted_pguid.items()) 
 
     print("getActions: Done")    
-    
+
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description='Included methods')
+    parser.add_argument('-p', '--pretty', help='pretty print jsonl object', type=bool)
+    parser.add_argument('-g', '--guid', help='get guid', type=bool)
+    parser.add_argument('-a', '--action', help='get action', type=bool)
+    parser.add_argument('-f', '--found', help='see if action has been found', type=bool)
+    global args
+    args = parser.parse_args()
+
     date = datetime.now()
     base_dir = "../../../../data/atlasv2/data/benign/h1/cbc-edr"
     output_dir = f"{base_dir}/output"
@@ -103,14 +112,18 @@ if __name__ == "__main__":
         os.makedirs(output_dir)
         print(f"New dir: {output_dir}")
 
-    #getGuid()
-    #main()
+    if args.guid:
+        get_guid()
+    if args.pretty:
+        pretty_print_object()
 
     # In case there are multiple files as in *atlasv2/*/attack/h1/cbc-edr/edr-h1-m*.jsonl
     count = 1
     while(count > 0):
         file = f'edr-h1-benign' # f'edr-h1-m{count}'
-        getActions(date, file, base_dir)
-        actionPrevFound(date, file, base_dir)
+        if args.action:
+            get_actions(date, file, base_dir)
+        if args.found:
+            action_prev_found(date, file, base_dir)
         print(f"File: {file} done")
         count -= 1
