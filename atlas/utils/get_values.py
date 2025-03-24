@@ -9,10 +9,45 @@ def print_all(key, value, of):
 
 def print_parser_columns(key, value, of):
     match key:
-        case 'process_guid' | 'parent_guid' | 'action' | 'device_timestamp' | \
-            'process_cmdline' | 'parent_cmdline' | 'parent_pid' | 'process_pid':
+        case "parent_cmdline" | 'process_cmdline' | 'device_timestamp' | 'process_path' | 'parent_path' | 'scriptload_publisher' | 'scriptload_effective_reputation' | 'scriptload_reputation' | 'scriptload_count' :
+        #case 'process_guid' | 'parent_guid' | 'action' | 'device_timestamp' | \
+            #'process_cmdline' | 'parent_cmdline' | 'parent_pid' | 'process_pid':
+
             of.writelines(f"{key} : {value}\n")
-            print(f'{key}')# : {value}')
+
+def get_types(file, base_dir, output_dir):
+    filename = f"{base_dir}/{file}.jsonl"
+    output_file = f"{output_dir}/types_{file}__{date}.txt"
+    f = open(filename, 'r')
+    of = open(output_file, 'w')
+    edge_types = list()
+    for line in f:
+        atlas_record = json.loads(line.strip())
+        for key, value in atlas_record.items():
+            if key == 'type':
+                if value not in edge_types:
+                    edge_types.append(value)
+
+    for edge in edge_types:
+        of.write(f"{edge}\n")
+
+def timestamp_in_order(file, base_dir, file_type):
+    filename = f"{base_dir}/{file}.{file_type}"
+    old_time = "1900-07-19 07:24:57.2328953 +0000 UTC"
+    
+    f = open(filename, 'r')
+    for line in f:
+        if file_type == 'jsonl':
+            atlas_record = json.loads(line.strip())
+            record_time = atlas_record['device_timestamp'] 
+        else: 
+            record_time = line.split('&')[1]
+
+        if record_time < old_time:
+            print (f"Record time: {record_time} and old: {old_time}" )
+        old_time = record_time
+
+    f.close
 
 # Pretty prints each X jsonl objects.
 def pretty_print_object(date, file, base_dir, objects, print_all_cols, print_parser_cols):
@@ -26,13 +61,26 @@ def pretty_print_object(date, file, base_dir, objects, print_all_cols, print_par
 
     f = open(filename, 'r')
     of = open(output_file, 'w')
-
+    paths = []
+    parent_paths= []
     for line in f:  
+        
         if objects <= 0:
             break
-        objects -= 1
 
         atlas_record = json.loads(line.strip())
+        if atlas_record['type'] != 'endpoint.event.scriptload':
+            continue
+        if atlas_record['process_path'] not in paths:
+            print(f"process: {atlas_record["process_path"]} || parent: {atlas_record['parent_path']}")
+
+            paths.append(atlas_record['process_path'])
+
+        if atlas_record['parent_path'] not in parent_paths:
+            print(f"parent: {atlas_record["parent_path"]}")
+
+            parent_paths.append(atlas_record['parent_path'])
+
         for key, value in atlas_record.items():
             if print_all_cols:
                 print_all(key, value, of)
@@ -40,9 +88,10 @@ def pretty_print_object(date, file, base_dir, objects, print_all_cols, print_par
                 print_parser_columns(key, value, of)
         #    of.writelines(f"{key} : {value}\n")
         #    print(f'{key}')# : {value}')
+        objects -= 1
 
         of.write('\n')
-        print("\n")
+        #print("\n")
 
     f.close()
     of.close
@@ -116,19 +165,23 @@ def get_actions(date, file, base_dir):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Included methods')
-    parser.add_argument('-pa', '--prettyAll', help='pretty print whole jsonl object', type=bool)
-    parser.add_argument('-pp', '--prettyParser', help='pretty print parser args jsonl object', type=bool)
-    parser.add_argument('-g', '--guid', help='get guid', type=bool)
-    parser.add_argument('-a', '--action', help='get action', type=bool)
-    parser.add_argument('-f', '--found', help='see if action has been found', type=bool)
+    parser.add_argument('-pa', '--prettyAll', help='Pretty print whole jsonl object', type=bool)
+    parser.add_argument('-pp', '--prettyParser', help='Pretty print parser args jsonl object', type=bool)
+    parser.add_argument('-g', '--guid', help='Get guid', type=bool)
+    parser.add_argument('-a', '--action', help='Get action', type=bool)
+    parser.add_argument('-f', '--found', help='See if action has been found', type=bool)
     parser.add_argument('-c', '--count', help='Number of times/files to run', type=int, default=1)
+    parser.add_argument('-t', '--types', help='Get all types', type=bool)
+    parser.add_argument('-ts', '--timestamp', help='Types: txt | jsonl See if records are in order by timestamp', type=str)
     global args
     args = parser.parse_args()
 
     date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     base_dir = "../../../../data/atlasv2/data/benign/h1/cbc-edr"
     output_dir = f"{base_dir}/output"
+    file = f'edr-h1-m1'
     file = f'edr-h1-benign'
+
     count = args.count
     
     if not os.path.exists(output_dir):
@@ -137,12 +190,15 @@ if __name__ == "__main__":
 
     if args.guid:
         get_guid()
-
+    
+    if args.timestamp != "":
+        timestamp_in_order(file, base_dir, args.timestamp)
     if args.prettyAll or args.prettyParser:
         pretty_print_object(date, file, base_dir, count, args.prettyAll, args.prettyParser)
         print(f"File: {file} done")
 
-
+    if args.types:
+        get_types(file, base_dir, output_dir)
     # In case there are multiple files as in *atlasv2/*/attack/h1/cbc-edr/edr-h1-m*.jsonl
     while(count > 0 and (args.action or args.found)):
        # file = f'{file}-{count}'
