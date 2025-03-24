@@ -1,74 +1,175 @@
+import math
 import argparse, json, os
 import utils.constants as constants
 
-# These are 100% wrong at the moment.
-def print_parser_columns(key, value, columns):
-    match key:
-        case 'parent_pid':
-            if type(value) is float:
-                columns[0] = int(value)
-            else:
-                columns[0] = value
-        case 'process_pid':
-            columns[1] = value
-        case 'parent_cmdline':
-            columns[2] = value
-        case 'process_cmdline': 
-            columns[3] = value
-        case 'action':
-            if '|' in value:
-                columns[4] = value
-            else:
-                columns[4] = constants.actionDict[value]
+def get_src(atlas_record):
+    if atlas_record['type'] == 'endpoint.event.scriptload':
+        return atlas_record['parent_path']
+    
+    return atlas_record['process_path']
 
-# Pretty prints each X jsonl objects.
-def convert_file_to_streamspot(file, base_dir):
-    filename = f"{base_dir}/{file}.jsonl"
-    output_file = f"{base_dir}/converted/ConvertedTest.txt"
+def get_action(action):
+    if '|' in action:
+        return action
+    else:
+        return constants.actionDict[action]
+    
+def get_parent_pid(pid):
+    if type(pid) is float:
+        return int(pid)
+    else:
+        return pid
+    
+def get_destionation(atlas_record):
+    match atlas_record['type']:
+        case 'endpoint.event.filemod':
+            return {
+                'dst': atlas_record['filemod_name'],
+                'dst_type': 'c'
+                }
+        case 'endpoint.event.regmod':
+            return {
+                'dst': atlas_record['regmod_name'],
+                'dst_type': 'c'
+            }           
+        case 'endpoint.event.moduleload':
+            return {
+                'dst': atlas_record['modload_name'],
+                'dst_type': 'c'
+            }   
+        case 'endpoint.event.procend' | 'endpoint.event.procstart':
+            return {
+                'dst': atlas_record['childproc_name'],
+                'dst_type': 'a'
+            }   
+        case 'endpoint.event.crossproc':
+            return {
+                'dst': atlas_record['crossproc_name'],
+                'dst_type': 'a'
+            } 
+        case 'endpoint.event.scriptload':
+            return {
+                'dst': atlas_record['process_path'],
+                'dst_type': 'a'
+            } 
+        case 'endpoint.event.netconn': 
+            return {
+                'dst': atlas_record['remote_ip'],
+                'dst_type': 'e'
+            }   
 
-    if not os.path.exists(f"{base_dir}/converted"):
-        os.makedirs(f"{base_dir}/converted")
+def get_path_id(path, seen_paths, no_paths):
+    if path not in seen_paths:
+        seen_paths[path] = no_paths
+        no_paths += 1
 
-    f = open(filename, 'r')
-    outFile = open(output_file, 'w+')
+    return seen_paths[path], no_paths
+
+def split_actions_and_add_to_records(value_dict, records):
+        actions = value_dict['edge_type'].split('|')
+
+        for action in actions:
+            action = constants.actionDict[action.strip()]
+
+            value_dict['edge_type'] = action
+            records.append(value_dict)
+        
+        return records
+
+def write_to_file(base_outfile, stream_outfile, records, base_length):
     count = 0
-
-    for line in f:
-        atlas_record = json.loads(line.strip())
-        columns = ["", "", "", "", ""]
-
-        for key, value in atlas_record.items():
-            print_parser_columns(key, value, columns)
-
-        if '|' in columns[4]:
-            actions = columns[4].split('|')
-            for action in actions:
-
-                columns[4] = constants.actionDict[action.strip()]
-                count += 1
-                # Src, src_type, dst, dst_type, edge_type, count
-                outFile.write(f"{columns[0]} {columns[1]} {columns[2]}:{columns[3]}:{columns[4]}:{count}\n")
-        else:
-            count += 1
-            # Src, src_type, dst, dst_type, edge_type, 
-            outFile.write(f"{columns[0]} {columns[1]} {columns[2]}:{columns[3]}:{columns[4]}:{count}\n")
+    for value_dict in records:
+        if count < base_length:
+            base_outfile.write(f"{value_dict['src']} {value_dict['dst']} {value_dict['src_type']}"+ 
+                    f":{value_dict['dst_type']}:{value_dict['edge_type']}:{count}\n")
+        else: 
+            stream_outfile.write(f"{value_dict['src']} {value_dict['dst']} {value_dict['src_type']}"+ 
+                    f":{value_dict['dst_type']}:{value_dict['edge_type']}:{count}\n")
+        count += 1
 
         if count % 50000 == 0:
             print("Lines written: ", count)
-    f.close()
-    outFile.close
+
+
+def convert_file_to_streamspot(file, base_output, stream_output, base_graph_size):
+ 
+    input_file = open(file, 'r')
+    base_outfile = open(base_output, 'w+')
+    stream_outfile = open(stream_output, 'w+')
+
+    seen_paths = dict()
+    no_paths = 0
+    records = []
+    print('Begin reading file.')
+    for line in input_file:
+        atlas_record = json.loads(line.strip())
+        destination = get_destionation(atlas_record)
+        src = get_src(atlas_record)
+
+        src_id, no_paths = get_path_id(src, seen_paths, no_paths)
+        dst_id, no_paths = get_path_id(destination['dst'], seen_paths, no_paths)
+
+        value_dict = {
+            'src': src_id,
+            'src_type': 'a',
+            'dst': dst_id,
+            'dst_type': destination['dst_type'],
+            'edge_type': atlas_record['action'],
+            'device_timestamp': atlas_record['device_timestamp'],
+            'unknown': '?',
+            'graph_id': atlas_record['schema'],
+        }
+
+        records = split_actions_and_add_to_records(value_dict, records)
+    print('Begin sorting records.')
+    records_sorted = sorted(records, key=lambda record: record['device_timestamp'])
+    print('Begin writing to files.')
+    write_to_file(base_outfile, stream_outfile, records_sorted, base_graph_size)
+
+    input_file.close()
+    base_outfile.close()
+    stream_outfile.close()
+
+def get_file_length(input_file):
+    with open(input_file, 'r') as fp:
+        return len(fp.readlines())
+
+def create_directories(directory):
+    directories = ['stream', 'base']
+    for dir in directories:
+        output_dir = os.path.dirname(f'{directory}{dir}')
+        if not os.path.exists(f"{output_dir}"):
+            os.makedirs(f"{output_dir}")
 
 if __name__ == "__main__":
- #   parser = argparse.ArgumentParser(description='Included methods')
- #   parser.add_argument('-f', '--filepath', help='File path and name, e.g. xx/yy/name.txt')
- #   parser.add_argument('-g', '--guid', help='get guid', type=bool)
- #   parser.add_argument('-a', '--action', help='get action', type=bool)
- #   parser.add_argument('-f', '--found', help='see if action has been found', type=bool)
- #   global args
- #   args = parser.parse_args()
+    parser = argparse.ArgumentParser(description='Included methods')
+    parser.add_argument('-d', '--directory', help='Input and output \'root\' directory e.g. xx/yy/. For easier input', type=str)
+    parser.add_argument('-i', '--input', help='Input file path and name, e.g. [--directory]name.jsonl', type=str)
+    parser.add_argument('-b', '--base', help='Output base file path and name, e.g. [--directory]name.txt', type=str)
+    parser.add_argument('-s', '--stream', help='Output stream file path and name, e.g. xx/yy/name.txt', type=str)
+    parser.add_argument('-l', '--length', help='the length of the base graph in absolute value (default is 10%% of the entire graph)', type=int)
 
-    base_dir = "../../../data/atlasv2/data/benign/h1/cbc-edr"
-    output_dir = f"{base_dir}/output"
-    file = f'edr-h1-benign'
+    parser.add_argument('-t', '--test', help='Preset values for testing', type=bool)
+    global args
+    args = parser.parse_args()
 
-    convert_file_to_streamspot(file, base_dir)
+    if args.test:
+        base_dir = "../../../data/atlasv2/data/benign/h1/cbc-edr"
+        input_file = f"{base_dir}/edr-h1-benign.jsonl"
+        base_output = f"{base_dir}/base/base_test.txt"
+        stream_output = f"{base_dir}/stream/stream_test.txt"
+        create_directories(f'{base_dir}/')
+    else:
+        input_file = args.directory + args.input
+        base_output = args.directory + args.base
+        stream_output = args.directory + args.stream
+        create_directories(args.directory)
+
+    file_length = get_file_length(input_file)
+    if not args.length:
+        base_graph_size = int(math.ceil(file_length * 0.1))
+    else:
+        base_graph_size = args.length
+
+    
+    convert_file_to_streamspot(input_file, base_output, stream_output, base_graph_size)
