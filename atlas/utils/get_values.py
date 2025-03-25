@@ -5,13 +5,11 @@ from datetime import datetime
 
 def print_all(key, value, of):
     of.writelines(f"{key} : {value}\n")
-    print(f'{key}')# : {value}')
 
 def print_parser_columns(key, value, of):
     match key:
-        case "parent_cmdline" | 'process_cmdline' | 'device_timestamp' | 'process_path' | 'parent_path' | 'scriptload_publisher' | 'scriptload_effective_reputation' | 'scriptload_reputation' | 'scriptload_count' :
-        #case 'process_guid' | 'parent_guid' | 'action' | 'device_timestamp' | \
-            #'process_cmdline' | 'parent_cmdline' | 'parent_pid' | 'process_pid':
+        case 'process_guid' | 'parent_guid' | 'action' | 'device_timestamp' | \
+            'process_cmdline' | 'parent_cmdline' | 'parent_pid' | 'process_pid':
 
             of.writelines(f"{key} : {value}\n")
 
@@ -64,21 +62,16 @@ def pretty_print_object(date, file, base_dir, objects, print_all_cols, print_par
     paths = []
     parent_paths= []
     for line in f:  
-        
         if objects <= 0:
             break
 
         atlas_record = json.loads(line.strip())
-        if atlas_record['type'] != 'endpoint.event.scriptload':
-            continue
         if atlas_record['process_path'] not in paths:
             print(f"process: {atlas_record["process_path"]} || parent: {atlas_record['parent_path']}")
-
             paths.append(atlas_record['process_path'])
 
         if atlas_record['parent_path'] not in parent_paths:
             print(f"parent: {atlas_record["parent_path"]}")
-
             parent_paths.append(atlas_record['parent_path'])
 
         for key, value in atlas_record.items():
@@ -86,10 +79,8 @@ def pretty_print_object(date, file, base_dir, objects, print_all_cols, print_par
                 print_all(key, value, of)
             if print_parser_cols:
                 print_parser_columns(key, value, of)
-        #    of.writelines(f"{key} : {value}\n")
-        #    print(f'{key}')# : {value}')
-        objects -= 1
 
+        objects -= 1
         of.write('\n')
         #print("\n")
 
@@ -191,8 +182,9 @@ if __name__ == "__main__":
     if args.guid:
         get_guid()
     
-    if args.timestamp != "":
+    if args.timestamp != None:
         timestamp_in_order(file, base_dir, args.timestamp)
+
     if args.prettyAll or args.prettyParser:
         pretty_print_object(date, file, base_dir, count, args.prettyAll, args.prettyParser)
         print(f"File: {file} done")
