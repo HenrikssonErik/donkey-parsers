@@ -188,9 +188,10 @@ if __name__ == "__main__":
         stream_output = f"{base_dir}/stream/stream_test.txt"
         create_directories(f'{base_dir}')
     else:
-        input_file = args.directory + args.input
-        base_output = args.directory + args.base
-        stream_output = args.directory + args.stream
+        print(args.directory+args.base)
+        input_file = f"{args.directory}/{args.input}"
+        base_output = f"{args.directory}/{args.base}"
+        stream_output = f"{args.directory}/{args.stream}"
         create_directories(args.directory)
 
     file_length = get_file_length(input_file)
