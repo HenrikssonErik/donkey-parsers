@@ -164,11 +164,9 @@ def create_directories(directory):
     directories = ['stream', 'base']
     print(directory)
     for dir in directories:
-        output_dir = os.path.dirname(f'{directory}/{dir}')
-        print(output_dir + "/" + dir)
-
-        if not os.path.exists(f"{directory}/{dir}"):
-            os.makedirs(f"{directory}/{dir}")
+        output_dir = f"{directory}/{dir}"
+        if not os.path.exists(output_dir):
+            os.makedirs(output_dir)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Included methods')
@@ -177,22 +175,14 @@ if __name__ == "__main__":
     parser.add_argument('-b', '--base', help='Output base file path and name, e.g. [--directory]name.txt', type=str)
     parser.add_argument('-s', '--stream', help='Output stream file path and name, e.g. [--directory]name.txt', type=str)
     parser.add_argument('-l', '--length', help='the length of the base graph in absolute value (default is 10%% of the entire graph)', type=int)
-    parser.add_argument('-t', '--test', help='Preset values for testing', type=bool)
     global args
     args = parser.parse_args()
 
-    if args.test:
-        base_dir = "../../../data/atlasv2/data/benign/h1/cbc-edr"
-        input_file = f"{base_dir}/edr-h1-benign.jsonl"
-        base_output = f"{base_dir}/base/base_test.txt"
-        stream_output = f"{base_dir}/stream/stream_test.txt"
-        create_directories(f'{base_dir}')
-    else:
-        print(args.directory+args.base)
-        input_file = f"{args.directory}/{args.input}"
-        base_output = f"{args.directory}/{args.base}"
-        stream_output = f"{args.directory}/{args.stream}"
-        create_directories(args.directory)
+    print(args.directory+args.base)
+    input_file = f"{args.directory}/{args.input}"
+    base_output = f"{args.directory}/{args.base}"
+    stream_output = f"{args.directory}/{args.stream}"
+    create_directories(args.directory)
 
     file_length = get_file_length(input_file)
     if not args.length:
