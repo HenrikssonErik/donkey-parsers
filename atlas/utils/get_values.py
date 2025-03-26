@@ -5,6 +5,7 @@ from datetime import datetime
 
 def print_all(key, value, of):
     of.writelines(f"{key} : {value}\n")
+  #  print(f"{key} : {value}")
 
 def print_parser_columns(key, value, of):
     match key:
@@ -49,31 +50,22 @@ def timestamp_in_order(file, base_dir, file_type):
 
 # Pretty prints each X jsonl objects.
 def pretty_print_object(date, file, base_dir, objects, print_all_cols, print_parser_cols):
-    type = ''
+    edge_type = ''
     if print_all_cols:
-        type = 'all'
+        edge_type = 'all'
     else:
-        type = 'parser'
+        edge_type = 'parser'
     filename = f"{base_dir}/{file}.jsonl"
-    output_file = f"{base_dir}/output/pretty_print_{type}_{file}__{date}_c{count}.txt"
+    output_file = f"{base_dir}/output/pretty_print_{edge_type}_{file}__{date}_c{objects}.txt"
 
     f = open(filename, 'r')
     of = open(output_file, 'w')
-    paths = []
-    parent_paths= []
+
     for line in f:  
         if objects <= 0:
             break
-
+        
         atlas_record = json.loads(line.strip())
-        if atlas_record['process_path'] not in paths:
-            print(f"process: {atlas_record["process_path"]} || parent: {atlas_record['parent_path']}")
-            paths.append(atlas_record['process_path'])
-
-        if atlas_record['parent_path'] not in parent_paths:
-            print(f"parent: {atlas_record["parent_path"]}")
-            parent_paths.append(atlas_record['parent_path'])
-
         for key, value in atlas_record.items():
             if print_all_cols:
                 print_all(key, value, of)
@@ -82,7 +74,6 @@ def pretty_print_object(date, file, base_dir, objects, print_all_cols, print_par
 
         objects -= 1
         of.write('\n')
-        #print("\n")
 
     f.close()
     of.close
@@ -161,20 +152,18 @@ if __name__ == "__main__":
     parser.add_argument('-g', '--guid', help='Get guid', type=bool)
     parser.add_argument('-a', '--action', help='Get action', type=bool)
     parser.add_argument('-f', '--found', help='See if action has been found', type=bool)
-    parser.add_argument('-c', '--count', help='Number of times/files to run', type=int, default=1)
+    parser.add_argument('-c', '--count', help='Number of times/files to run', type=int, default=9999999)
     parser.add_argument('-t', '--types', help='Get all types', type=bool)
     parser.add_argument('-ts', '--timestamp', help='Types: txt | jsonl See if records are in order by timestamp', type=str)
     global args
     args = parser.parse_args()
-
+    count = args.count
     date = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     base_dir = "../../../../data/atlasv2/data/benign/h1/cbc-edr"
     output_dir = f"{base_dir}/output"
     file = f'edr-h1-m1'
     file = f'edr-h1-benign'
 
-    count = args.count
-    
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
         print(f"New dir: {output_dir}")
