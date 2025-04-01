@@ -160,6 +160,8 @@ def write_to_file(base_outfile, stream_outfile, records, base_length):
         if count % 50000 == 0:
             print("Lines written: ", count)
 
+    print("Total lines written: ", count)
+
 def convert_file_to_streamspot(file, base_output, stream_output, base_length):
     """ Main method that converts the atlas jsonl file to the parsed txt Unicorn format. """
     input_file = open(file, 'r')
@@ -186,7 +188,7 @@ def get_file_length(input_file):
 
 def create_directories(directory):
     """ Creates the stream and base directory. """
-    directories = ['stream', 'base']
+    directories = ['stream', 'base', 'split']
     print(directory)
     for dir in directories:
         output_dir = f"{directory}/{dir}"
