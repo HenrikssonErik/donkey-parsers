@@ -1,6 +1,13 @@
 show_commands:
 	grep -E '^[a-zA-Z0-9_-]+:' Makefile | sed 's/://' \
 
+make_all:
+	make atlas_h1_benign
+	make atlas_h2_benign
+	make atlas_h1_multi_attack
+	make atlas_h2_multi_attack
+	make atlas_h1_single_attack
+
 atlas_h1_benign:
 	test -f venv/bin/activate || virtualenv -p $(shell which python) venv
 	. venv/bin/activate ; \
