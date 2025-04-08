@@ -78,7 +78,6 @@ def create_records(input_file):
             'dst_type': destination['dst_type'],
             'edge_type': atlas_record['action'],
             'device_timestamp': atlas_record['device_timestamp'],
-            'graph_id': atlas_record['schema'],
             'new_src': 0, #Placeholder
             'new_dst': 0 # Placeholder
         }
