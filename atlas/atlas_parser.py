@@ -187,7 +187,7 @@ def get_file_length(input_file):
 
 def create_directories(directory):
     """ Creates the stream and base directory. """
-    directories = ['stream', 'base', 'split']
+    directories = ['stream', 'base']
     print(directory)
     for dir in directories:
         output_dir = f"{directory}/{dir}"
