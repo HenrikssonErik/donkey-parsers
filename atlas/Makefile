@@ -25,6 +25,19 @@ atlas_h1_benign:
 			-b base/atlas-base-h1-benign.txt \
 			-s stream/atlas-stream-h1-benign.txt \
 
+
+splitter_atlas_h1_benign:
+	mkdir -p split_base
+	mkdir -p split_stream
+	test -f venv/bin/activate || virtualenv -p $(shell which python) venv
+	. venv/bin/activate ; \
+		python atlas_splitter.py \
+			-d ../../../data/atlasv2/data/benign/h1/cbc-edr \
+			-i edr-h1-benign \
+			-b split_base/atlas-base-h1-benign \
+			-s split_stream/atlas-stream-h1-benign \
+			-f 8 \
+
 atlas_h2_benign:
 	test -f venv/bin/activate || virtualenv -p $(shell which python) venv
 	. venv/bin/activate ; \
@@ -34,33 +47,62 @@ atlas_h2_benign:
 			-b base/atlas-base-h2-benign.txt \
 			-s stream/atlas-stream-h2-benign.txt \
 
+splitter_atlas_benign:
+	mkdir -p ../../../data/atlasv2/data/benign/h1/cbc-edr/split_base
+	mkdir -p ../../../data/atlasv2/data/benign/h1/cbc-edr/split_stream
+	mkdir -p ../../../data/atlasv2/data/benign/h2/cbc-edr/split_base
+	mkdir -p ../../../data/atlasv2/data/benign/h2/cbc-edr/split_stream
 
-atlas_h1_benign_split:
 	test -f venv/bin/activate || virtualenv -p $(shell which python) venv
 
-	number=0 ; while [ $$number -le 7 ] ; do \
-		venv/bin/python atlas_parser.py \
-			-d ../../../data/atlasv2/data/benign/h1/cbc-edr \
-			-i split/edr-h1-benign-$$number.jsonl \
-			-b base/atlas-base-h1-benign-$$number.txt \
-			-s stream/atlas-stream-h1-benign-$$number.txt ; \
+	number=1 ; while [ $$number -le 2 ] ; do \
+		venv/bin/python atlas_splitter.py \
+			-d ../../../data/atlasv2/data/benign/h$$number/cbc-edr \
+			-i edr-h$$number-benign \
+			-b split_base/atlas-base-h$$number-benign \
+			-s split_stream/atlas-stream-h$$number-benign \
+			-f 8 ; \
 		number=`expr $$number + 1` ; \
 	done 
+			
 
-atlas_h2_benign_split:
-	test -f venv/bin/activate || virtualenv -p $(shell which python) venv
-
-	number=0 ; while [ $$number -le 7 ] ; do \
-		venv/bin/python atlas_parser.py \
-			-d ../../../data/atlasv2/data/benign/h2/cbc-edr \
-			-i split/edr-h2-benign-$$number.jsonl \
-			-b base/atlas-base-h2-benign-$$number.txt \
-			-s stream/atlas-stream-h2-benign-$$number.txt ; \
-		number=`expr $$number + 1` ; \
-	done 
 #-------------------------------------------------------------#
 #---------------------------ATTACKS---------------------------#
 #-------------------------------------------------------------#
+splitter_atlas_attack:
+	mkdir -p ../../../data/atlasv2/data/attack/h1/cbc-edr/split_base
+	mkdir -p ../../../data/atlasv2/data/attack/h1/cbc-edr/split_stream
+	mkdir -p ../../../data/atlasv2/data/attack/h2/cbc-edr/split_base
+	mkdir -p ../../../data/atlasv2/data/attack/h2/cbc-edr/split_stream
+
+	test -f venv/bin/activate || virtualenv -p $(shell which python) venv
+
+	number=1 ; while [ $$number -le 6 ] ; do \
+		venv/bin/python atlas_splitter.py \
+			-d ../../../data/atlasv2/data/attack/h1/cbc-edr \
+			-i edr-h1-m$$number \
+			-b split_base/atlas-base-h1-attack-m$$number \
+			-s split_stream/atlas-stream-h1-attack-m$$number ; \
+		number=`expr $$number + 1` ; \
+	done 
+
+	number=1 ; while [ $$number -le 6 ] ; do \
+		venv/bin/python atlas_splitter.py \
+			-d ../../../data/atlasv2/data/attack/h2/cbc-edr \
+			-i edr-h2-m$$number \
+			-b split_base/atlas-base-h2-attack-m$$number \
+			-s split_stream/atlas-stream-h2-attack-m$$number ; \
+		number=`expr $$number + 1` ; \
+	done
+
+	number=1 ; while [ $$number -le 4 ] ; do \
+		venv/bin/python atlas_splitter.py \
+			-d ../../../data/atlasv2/data/attack/h1/cbc-edr \
+			-i edr-h1-s$$number \
+			-b base/atlas-base-h1-attack-s$$number \
+			-s stream/atlas-stream-h1-attack-s$$number ; \
+		number=`expr $$number + 1` ; \
+	done 
 
 atlas_h1_multi_attack:
 	test -f venv/bin/activate || virtualenv -p $(shell which python) venv
