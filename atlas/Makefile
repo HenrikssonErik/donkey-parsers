@@ -99,8 +99,8 @@ splitter_atlas_attack:
 		venv/bin/python atlas_splitter.py \
 			-d ../../../data/atlasv2/data/attack/h1/cbc-edr \
 			-i edr-h1-s$$number \
-			-b base/atlas-base-h1-attack-s$$number \
-			-s stream/atlas-stream-h1-attack-s$$number ; \
+			-b split_base/atlas-base-h1-attack-s$$number \
+			-s split_stream/atlas-stream-h1-attack-s$$number ; \
 		number=`expr $$number + 1` ; \
 	done 
 
