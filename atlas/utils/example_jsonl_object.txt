@@ -1,0 +1,66 @@
+type : endpoint.event.filemod
+process_guid : 7DMF69PK-05debeef-000009b8-00000000-1d8984c85f4a992
+parent_guid : 7DMF69PK-05debeef-000001e0-00000000-1d8984c83839290
+backend_timestamp : 2022-07-19 07:26:53 +0000 UTC
+org_key : 7DMF69PK
+device_id : 98483951
+device_name : WIN-32-H1
+device_external_ip : 130.126.255.183
+device_os : WINDOWS
+device_group : 
+action : ACTION_FILE_CREATE | ACTION_FILE_MOD_OPEN | ACTION_FILE_OPEN_WRITE | ACTION_FILE_OPEN_SET_ATTRIBUTES
+schema : 1
+device_timestamp : 2022-07-19 07:24:57.2128941 +0000 UTC
+process_terminated : False
+process_reputation : REP_RESOLVING
+parent_reputation : REP_RESOLVING
+process_pid : 2488
+parent_pid : 480.0
+process_publisher : [{'name': 'Cortado AG', 'state': 'FILE_SIGNATURE_STATE_SIGNED | FILE_SIGNATURE_STATE_VERIFIED'}]
+process_path : c:\program files\vmware\vmware tools\tpautoconnsvc.exe
+parent_path : c:\windows\system32\services.exe
+process_hash : ['7bc6e9df892edd7e09c544b598fa5eb3', '3e2b444059769eda3d0ca96ca7f8bf49f81193a370d37045b64098ce2c1707ae']
+parent_hash : ['5f1b6a9c35d3d5ca72d6d6fdef9747d6', 'd7bc4ed605b32274b45328fd9914fb0e7b90d869a38f0e6f94fb1bf4e9e2b407']
+process_cmdline : "C:\Program Files\VMware\VMware Tools\TPAutoConnSvc.exe"
+parent_cmdline : C:\Windows\system32\services.exe
+process_username : NT AUTHORITY\SYSTEM
+sensor_action : ACTION_ALLOW
+event_origin : EDR
+filemod_hash : ['', '']
+filemod_name : c:\windows\system32\spool\drivers\w32x86\tp ps driver 642d4d86fc304982923cb27485a07b19.ppd
+regmod_name : None
+modload_name : None
+modload_count : None
+modload_effective_reputation : None
+modload_hash : None
+modload_md5 : None
+modload_publisher : None
+modload_sha256 : None
+process_duration : None
+target_cmdline : None
+remote_port : None
+remote_ip : None
+local_port : None
+local_ip : None
+netconn_domain : None
+netconn_inbound : None
+netconn_protocol : None
+netconn_community_id : None
+childproc_name : None
+childproc_hash : None
+childproc_pid : None
+childproc_guid : None
+childproc_username : None
+childproc_publisher : None
+childproc_reputation : None
+crossproc_name : None
+crossproc_guid : None
+crossproc_hash : None
+crossproc_action : None
+crossproc_publisher : None
+crossproc_reputation : None
+crossproc_target : None
+scriptload_count : None
+scriptload_reputation : None
+scriptload_effective_reputation : None
+scriptload_publisher : None

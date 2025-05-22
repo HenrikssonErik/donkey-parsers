@@ -1,0 +1,196 @@
+Guid seem to be file specific not system specifc, they do not reoccur over multiple fileless_scriptload
+
+WE MUST INCLUDE PARENTS SOMEHOW, eg firefox used cmd to do stuff. This is exploited in S1. How do we model this
+Should we make it directly to unicorn format or go via streamspot format?
+Should we use PIDs to differentiate differnet processes of the same type  from eachother?
+
+NOTES: 
+NodeIds must start from 0, and cant skip ids!!
+Filepaths are not sensitive to filepaths in Windows which it was recorded from
+
+Streamspot types:
+
+map = {'process': 'a',
+       'thread': 'b',
+       'file': 'c',
+       'MAP_ANONYMOUS': 'd',
+       'NA': 'e',
+       'stdin': 'f',
+       'stdout': 'g',
+       'stderr': 'h',
+       'accept': 'i',
+       'access': 'j',
+       'bind': 'k',
+       'chmod': 'l',
+       'clone': 'm',
+       'close': 'n',
+       'connect': 'o',
+       'execve': 'p',
+       'fstat': 'q',
+       'ftruncate': 'r',
+       'listen': 's',
+       'mmap2': 't',
+       'open': 'u',
+       'read': 'v',
+       'recv': 'w',
+       'recvfrom': 'x',
+       'recvmsg': 'y',
+       'send': 'z',
+       'sendmsg': 'A',
+       'sendto': 'B',
+       'stat': 'C',
+       'truncate': 'D',
+       'unlink': 'E',
+       'waitpid': 'F',
+       'write': 'G',
+       'writev': 'H',
+       'exit' : 'I'
+       'ptrace' : 'J'
+      }
+
+File Actions: {
+ACTION_FILE_CREATE: 'u'
+ACTION_FILE_DELETE: 'E'
+ACTION_FILE_LAST_WRITE: 'GG'
+ACTION_FILE_MOD_OPEN: 'uu'
+ACTION_FILE_OPEN_DELETE: 'EE'
+ACTION_FILE_OPEN_EXECUTE: 'p'
+ACTION_FILE_OPEN_READ: 'v'
+ACTION_FILE_OPEN_SET_ATTRIBUTES: 'c'
+ACTION_FILE_OPEN_SET_SECURITY: 'j' 
+ACTION_FILE_OPEN_WRITE: 'uG'
+ACTION_FILE_READ: 'vv'
+ACTION_FILE_RENAME: 'H' 
+ACTION_FILE_TRUNCATE: 'D'
+ACTION_FILE_UNDELETE: 'ue'
+ACTION_FILE_WRITE: 'G'
+
+ACTION_WRITE_VALUE: 'gv'
+}
+
+Netconn Actions: {
+    ACTION_CONNECTION_CREATE: 'o'
+    ACTION_CONNECTION_ESTABLISHED: 'i'
+    ACTION_CONNECTION_LISTEN: 's'
+    ACTION_CONNECTION_CLOSE: 'n'
+    ACTION_CONNECTION_CREATE_FAILED: 'oo'
+}
+
+REGMOD ACTIONS {
+    ACTION_CREATE_KEY: 'K'
+    ACTION_DELETE_KEY: 'dk'
+    ACTION_DELETE_VALUE: 'dv'
+    ACTION_OPEN_KEY_DELETE: 'DK'
+    ACTION_OPEN_KEY_READ: 'kr'
+    ACTION_OPEN_KEY_WRITE: 'KK' 
+    ACTION_LOAD_KEY: 'lk'
+}
+
+MODLOAD ACTIONS {
+    ACTION_LOAD_MODULE: 't'
+}
+
+PROCSTART ACTIONS {
+    ACTION_CREATE_PROCESS: 'pp'
+    ACTION_CREATE_PROCESS_EFFECTIVE: 'pe'
+    ACTION_PROCESS_DISCOVERED: 'pd'
+}
+
+PROCEND ACTIONS {
+    ACTION_PROCESS_TERMINATE: 'I'
+}
+
+CROSSPROC ACTIONS {
+    ACTION_DUP_PROCESS_HANDLE: 'dup'
+    ACTION_DUP_THREAD_HANDLE: 'db'
+    ACTION_OPEN_PROCESS_HANDLE: 'J'
+    ACTION_OPEN_THREAD_HANDLE: 'b'
+}
+
+SCRIPTLOAD ACTIONS {
+    ACTION_LOAD_SCRIPT: 'pls'
+}
+
+
+
+Event Types:
+
+filemod{
+    src: process_path
+    src_type: 'a'
+    dst: filemod_name
+    dst_type: 'c'
+    edge_type: File action (can create multiple edges depending on action, see File Actions list)
+    graph_id: schema
+    time: device_timestamp
+}
+
+netconn{
+    src: process_path
+    src_type: 'a'
+    dst: remote_ip
+    dst_type: 'e'
+    edge_type: Netconn action (can create multiple edges depending on action, see Netconn Actions list)
+    graph_id: schema
+    time: device_timestamp
+}
+
+regmod {
+    src: process_path
+    src_type: 'a'
+    dst: regmod_name
+    dst_type: 'c'
+    edge_type: Regmod action  (can create multiple edges depending on action, see REGMOD Actions list)
+    graph_id: schema
+    time: device_timestamp
+    }
+
+moduleload {
+     src: process_path
+    src_type: 'a'
+    dst: modload_name
+    dst_type: 'c'
+    edge_type: Modload action (can create multiple edges depending on action, see File Actions list)
+    graph_id: schema
+    time: device_timestamp
+}
+procend {
+    src: process_path
+    src_type: 'a'
+    dst: childproc_name
+    dst_type: 'a'
+    edge_type: Procstart action (can create multiple edges depending on action, see procend Actions list)
+    graph_id: schema
+    time: device_timestamp
+}
+procstart {
+    src: process_path
+    src_type: 'a'
+    dst: childproc_name
+    dst_type: 'a'
+    edge_type: Procstart action (can create multiple edges depending on action, see procstart Actions list)
+    graph_id: schema
+    time: device_timestamp
+}
+crossproc {
+    src: process_path
+    src_type: 'a'
+    dst: crossproc_name
+    dst_type: 'a'
+    edge_type: Crossproc action (can create multiple edges depending on action, see crossproc Actions list)
+    graph_id: schema
+    time: device_timestamp
+}
+scriptload {
+    src: parent_path
+    src_type: 'a'
+    dst: process_path
+    dst_type: 'a'
+    edge_type: Crossproc action (can create multiple edges depending on action, see crossproc Actions list)
+    graph_id: schema
+    time: device_timestamp
+}
+
+
+fileless_scriptload: None found in dataset
+scrptload: none found in dataset
